@@ -8,7 +8,7 @@ import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import '../login/login.css'
 import { useDispatch, useSelector } from 'react-redux';
 import { registerUser } from '../../redux/actions/authActions';
-import { CircularProgress } from '@mui/material';
+import { CircularProgress, FormControl, InputLabel, MenuItem, Select } from '@mui/material';
 import { notify } from '../../utils/HelperFunctions';
 import { useState } from 'react';
 
@@ -17,6 +17,7 @@ function Signup() {
 
     const form = useRef({})
     const navigate = useNavigate()
+    // const [role, setRole] = useState('');
     const [showPass, setShowPass] = useState(false)
     const { isLoading, error, user } = useSelector((state) => state.auth)
     const dispatch = useDispatch()
@@ -29,18 +30,23 @@ function Signup() {
 
     const handleForm = async (e) => {
         e.preventDefault()
-        if (!form.current.username.trim() || !form.current.email.trim() || !form.current.password.trim()) return;
+        
+        if (!form.current.username.trim() || !form.current.email.trim() || !form.current.password.trim() || !form.current.role) return;
 
         await dispatch(registerUser(form.current))
             .then((msg) => {
                 notify('success', msg)
-                navigate('/otp')
+                navigate('/login')
             })
             .catch((err) => notify('error', err))
     }
     const handleShowPassword = () => {
         setShowPass((prev) => !prev)
     }
+
+    // const handleChange = (event) => {
+    //     setRole(event.target.value);
+    // };
 
     return (
         <>
@@ -60,14 +66,32 @@ function Signup() {
                         <input onChange={(e) => form.current = { ...form.current, [e.target.name]: e.target.value }} placeholder="Enter Email" name='email' className="input" type="email" required />
                     </div>
                     <div className="flex-column">
-                        <label>Password </label></div>
+                        <label>Password </label>
+                    </div>
                     <div className="inputForm">
                         <LockOutlinedIcon />
-                        <input onChange={(e) => form.current = { ...form.current, [e.target.name]: e.target.value }} name='password' placeholder="Enter Password" className="input"  type={showPass ? "text" : "password"} required />
+                        <input onChange={(e) => form.current = { ...form.current, [e.target.name]: e.target.value }} name='password' placeholder="Enter Password" className="input" type={showPass ? "text" : "password"} required />
                         <div onClick={handleShowPassword} style={{ cursor: 'pointer' }}>
                             {showPass ? <VisibilityIcon /> : <VisibilityOffIcon />}
                         </div>
                     </div>
+                    
+                    <FormControl fullWidth>
+                        <InputLabel id="demo-simple-select-label">Role</InputLabel>
+                        <Select
+                            labelId="demo-simple-select-label"
+                            id="demo-simple-select"
+                            value={form.current.role}
+                            label="Role"
+                            name='role'
+                            onChange={(e) => form.current = { ...form.current, [e.target.name]: e.target.value }}
+                        >
+                            <MenuItem value={'student'}>Student</MenuItem>
+                            <MenuItem value={'teacher'}>Teacher</MenuItem>
+                            
+                        </Select>
+                    </FormControl>
+
 
                     <button className="button-submit">
                         {isLoading && <CircularProgress color="inherit" size="20px" />}
