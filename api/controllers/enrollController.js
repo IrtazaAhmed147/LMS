@@ -17,7 +17,7 @@ export const enrollStudent = async (req, res) => {
             $push: { enrolledStudents: userId }
         })
         await User.findByIdAndUpdate(userId, {
-            $push: { enrolledCourses: courseId }
+            $push: { enrolledCourses: {courseId} }
         });
 
         successHandler(res, 200, "Student enrolled in course")

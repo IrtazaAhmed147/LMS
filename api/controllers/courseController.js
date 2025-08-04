@@ -1,4 +1,5 @@
 import Course from "../models/CourseModel.js";
+import User from "../models/userModel.js";
 import { uploadOnCloudinary } from "../utils/cloudinary.js";
 import { errorHandler, successHandler } from "../utils/responseHandler.js";
 
@@ -15,7 +16,7 @@ export const getAllCourses = async (req, res) => {
     }
 }
 export const getSpecificCourse = async (req, res) => {
-   try {
+    try {
         const courses = await Course.findOne(req.params.id).populate("teacherId", "username email profilePic").limit(Number(limit))
         successHandler(res, 200, "All courses fetched", courses)
     }
@@ -31,7 +32,7 @@ export const getTeacherCourses = async (req, res) => {
         successHandler(res, 200, "course found successfully", courses)
     }
     catch (err) {
-        console.log(err);
+        
         errorHandler(res, 500, err.message)
     }
 }
@@ -49,6 +50,9 @@ export const createCourse = async (req, res) => {
             title, description, teacherId: req.user.id, thumbnail: req.body.thumbnail
         })
         await courseData.save()
+        await User.findByIdAndUpdate(req.user.id, {
+            $push: { createdCourses: courseData._id }
+        })
         successHandler(res, 201, "course created successfully", courseData)
     }
     catch (err) {
@@ -58,6 +62,20 @@ export const createCourse = async (req, res) => {
 export const deletecourse = async (req, res) => {
     try {
         const courseData = await Course.findByIdAndDelete(req.params.id);
+        
+        await User.findByIdAndUpdate(courseData.teacherId, {
+            $pull: { createdCourses: courseData._id }
+        });
+
+        // Remove from all users' enrolledCourses
+        await User.updateMany(
+            {},
+            {
+                $pull: {
+                    enrolledCourses: { courseId: courseData._id }
+                }
+            }
+        );
         successHandler(res, 200, "course deleted successfully", courseData)
     }
     catch (err) {

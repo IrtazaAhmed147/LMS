@@ -10,7 +10,7 @@ export const getAllLessons = async (req, res) => {
     const filter = {};
     if (title) filter.title = { $regex: title, $options: 'i' };
     try {
-        const lessons = await Lesson.find(filter).populate("courseId","title description teacherId").limit(Number(limit))
+        const lessons = await Lesson.find(filter).populate("courseId", "title description teacherId").limit(Number(limit))
         successHandler(res, 200, "All lessons fetched", lessons)
     }
     catch (err) {
@@ -26,10 +26,17 @@ export const getCourseLessons = async (req, res) => {
 
     try {
         const user = await User.findById(req.user.id);
-        if (!user.enrolledCourses.includes(req.params.id)) {
-            return res.status(403).json({ message: "You are not enrolled" });
+        
+        const isEnrolled = user.enrolledCourses.find((course)=> {
+           return course.courseId.toString() === req.params.id
+        })
+        const isCreator = user.createdCourses.includes(req.params.id);
+        const isAdmin = req.user.role === "admin";
+
+        if (!isEnrolled && !isCreator && !isAdmin) {
+            return res.status(403).json({ message: "Access denied" });
         }
-        const lessons = await lesson.find({ courseId: req.params.id, ...filter }).populate("courseId","title description teacherId").limit(Number(limit))
+        const lessons = await lesson.find({ courseId: req.params.id, ...filter }).populate("courseId", "title description teacherId").sort({ createdAt: -1 }).limit(Number(limit))
         successHandler(res, 200, "lesson found successfully", lessons)
     }
     catch (err) {
@@ -38,13 +45,17 @@ export const getCourseLessons = async (req, res) => {
     }
 }
 export const getSpecificLesson = async (req, res) => {
-    
+
     try {
         const user = await User.findById(req.user.id);
-        if (!user.enrolledCourses.includes(req.params.id)) {
-            return res.status(403).json({ message: "You are not enrolled" });
+        const isEnrolled = user.enrolledCourses.includes(req.params.id);
+        const isCreator = user.createdCourses.includes(req.params.id);
+        const isAdmin = req.user.role === "admin";
+
+        if (!isEnrolled && !isCreator && !isAdmin) {
+            return res.status(403).json({ message: "Access denied" });
         }
-        const lessons = await lesson.findOne(req.params.id).populate("courseId","title description teacherId").limit(Number(limit))
+        const lessons = await lesson.findOne(req.params.id).populate("courseId", "title description teacherId").limit(Number(limit))
         successHandler(res, 200, "lesson found successfully", lessons)
     }
     catch (err) {
@@ -78,6 +89,9 @@ export const createLesson = async (req, res) => {
 export const deleteLesson = async (req, res) => {
     try {
         const lessonData = await Lesson.findByIdAndDelete(req.params.id);
+        await CourseModel.findByIdAndUpdate(lessonData.courseId, {
+            $pull: { lessons: lessonData._id }
+        })
         successHandler(res, 200, "lesson deleted successfully", lessonData)
     }
     catch (err) {
@@ -97,5 +111,32 @@ export const updateLesson = async (req, res) => {
     }
     catch (err) {
         errorHandler(res, 500, err.message)
+    }
+}
+export const lessonComplete = async (req, res) => {
+    try {
+        const {courseId , lessonId }= req.params
+        const user = await User.findById(req.user.id);
+
+        if (!user) return errorHandler(res, 404, "User not found");
+
+        // Find the enrolled course
+        const enrolledCourse = user.enrolledCourses.find((course) =>
+            course.courseId.toString() === courseId
+        );
+        if (!enrolledCourse)
+            return errorHandler(res, 400, "User is not enrolled in this course");
+
+        // Avoid duplicate lesson entries
+        if (!enrolledCourse.completedLessons.includes(lessonId)) {
+            enrolledCourse.completedLessons.push(lessonId);
+        }
+
+        // Save updated user
+        await user.save();
+
+        successHandler(res, 200, "Lesson marked as completed");
+    } catch (error) {
+        errorHandler(res, 500, error.message)
     }
 }

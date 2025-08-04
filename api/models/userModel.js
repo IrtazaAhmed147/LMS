@@ -23,10 +23,12 @@ const userSchema = new mongoose.Schema({
         required: true,
         lowercase: true,
     },
-    enrolledCourses: [{
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "course"
-    }],
+    enrolledCourses: [
+        {
+            courseId: { type: mongoose.Schema.Types.ObjectId, ref: "course" },
+            completedLessons: [{ type: mongoose.Schema.Types.ObjectId, ref: "lesson" }]
+        }
+    ],
     createdCourses: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: "course"
