@@ -11,7 +11,7 @@ const upload = multer({ storage: storage })
 
 courseRouter.get('/', getAllCourses)
 courseRouter.get('/teacher/:id', verifyTeacher,getTeacherCourses)
-courseRouter.post('/add/:id', verifyTeacher,upload.single('thumbnail'),createCourse)
+courseRouter.post('/add', verifyTeacher,upload.single('thumbnail'),createCourse)
 courseRouter.delete('/delete/:id', verifyTeacher,deletecourse)
 courseRouter.put('/update/:id', verifyTeacher,updatecourse)
 

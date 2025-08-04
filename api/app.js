@@ -1,12 +1,11 @@
 import express from 'express'
 import dotenv from "dotenv"
 import cors from "cors"
-import cookieParser from 'cookie-parser'
 import { connectDB } from './utils/connectDB.js'
-import helmet from "helmet"
 import { userRouter } from './routes/userRoute.js'
 import { authRouter } from './routes/authRoute.js'
 import { courseRouter } from './routes/courseRoute.js'
+import { lessonRouter } from './routes/lessonRoute.js'
 // import mongoSanitize from "express-mongo-sanitize"
 
 const app = express()
@@ -19,9 +18,7 @@ connectDB()
 
 
 // middleware
-app.use(cookieParser())
 app.use(express.json())
-app.use(helmet())
 // app.use(mongoSanitize())
 
 app.use(cors({
@@ -35,6 +32,7 @@ app.use(cors({
 app.use('/api/auth', authRouter)
 app.use('/api/user', userRouter)
 app.use('/api/course', courseRouter)
+app.use('/api/lesson', lessonRouter)
 
 
 
