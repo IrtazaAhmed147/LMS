@@ -14,6 +14,15 @@ export const getAllCourses = async (req, res) => {
         errorHandler(res, 500, err.message)
     }
 }
+export const getSpecificCourse = async (req, res) => {
+   try {
+        const courses = await Course.findOne(req.params.id).populate("teacherId", "username email profilePic").limit(Number(limit))
+        successHandler(res, 200, "All courses fetched", courses)
+    }
+    catch (err) {
+        errorHandler(res, 500, err.message)
+    }
+}
 
 
 export const getTeacherCourses = async (req, res) => {

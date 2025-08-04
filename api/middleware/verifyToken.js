@@ -46,3 +46,13 @@ export const verifyTeacher = (req, res, next) => {
     }
   });
 };
+export const verifyStudent = (req, res, next) => {
+  verifyToken(req, res, (err) => {
+    if (err) return next(err);
+    if (req.user.role === "student" || req.user.role === "admin") {
+      next();
+    } else {
+      return next(errorHandler(res,403, "student and admin allowed!"));
+    }
+  });
+};

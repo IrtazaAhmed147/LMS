@@ -6,6 +6,7 @@ import { userRouter } from './routes/userRoute.js'
 import { authRouter } from './routes/authRoute.js'
 import { courseRouter } from './routes/courseRoute.js'
 import { lessonRouter } from './routes/lessonRoute.js'
+import { enrollRouter } from './routes/enrollRouter.js'
 // import mongoSanitize from "express-mongo-sanitize"
 
 const app = express()
@@ -33,6 +34,7 @@ app.use('/api/auth', authRouter)
 app.use('/api/user', userRouter)
 app.use('/api/course', courseRouter)
 app.use('/api/lesson', lessonRouter)
+app.use('/api/enroll', enrollRouter)
 
 
 

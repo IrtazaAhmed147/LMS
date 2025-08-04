@@ -51,7 +51,7 @@ export const login = async (req, res, next) => {
         if (!isPasswordCorrect) {
             return errorHandler(res, 404, "Invalid Credentials")
         }
-        const token = jwt.sign({ id: user._id, username: user.username, role: user.role }, process.env.JWT, {
+        const token = jwt.sign({ id: user._id, username: user.username, role: user.role}, process.env.JWT, {
             expiresIn: process.env.JWT_EXP
         })
         const { password, ...otherDetails } = user._doc

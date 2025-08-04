@@ -1,17 +1,19 @@
 import express from 'express';
 import multer from 'multer';
-import { createLesson, deleteLesson, getCourseLessons, updateLesson } from '../controllers/lessonController.js';
+import { createLesson, deleteLesson, getAllLessons, getCourseLessons, getSpecificLesson, updateLesson } from '../controllers/lessonController.js';
+import { verifyAdmin, verifyStudent, verifyTeacher } from '../middleware/verifyToken.js';
 
 const lessonRouter = express.Router();
 
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage })
 
-// lessonRouter.get('/', getAllLessons)
-lessonRouter.get('/course/:id', getCourseLessons)
-lessonRouter.post('/add', upload.single('contentUrl'),createLesson)
-lessonRouter.delete('/delete/:id', deleteLesson)
-lessonRouter.put('/update/:id', updateLesson)
+lessonRouter.get('/', verifyAdmin,getAllLessons)
+lessonRouter.get('/course/:id', verifyStudent,getCourseLessons)
+lessonRouter.get('/single/:id', verifyStudent,getSpecificLesson)
+lessonRouter.post('/add', upload.single('contentUrl'),verifyTeacher,createLesson)
+lessonRouter.delete('/delete/:id', verifyTeacher,deleteLesson)
+lessonRouter.put('/update/:id', verifyTeacher,updateLesson)
 
 
 
