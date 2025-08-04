@@ -40,6 +40,7 @@ export const getTeacherCourses = async (req, res) => {
 export const createCourse = async (req, res) => {
     const { title, description } = req.body
     const file = req.file
+    
     try {
         if (!title || !description) return errorHandler(res, 400, "missing fields")
         if (file) {
