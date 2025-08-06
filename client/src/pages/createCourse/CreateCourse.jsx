@@ -10,19 +10,31 @@ import {
   Select,
   Divider
 } from '@mui/material';
+import { useParams } from 'react-router-dom';
 
-const CreateCourse = () => {
+const CreateCourse = ({ initialData = null }) => {
+
+  const {mode} = useParams()
+  console.log(mode);
+  
+
   const [courseData, setCourseData] = useState({
-    title: '',
-    description: '',
-    category: '',
-    duration: '',
+    title: initialData?.title || '',
+    description: initialData?.description || '',
+    category: initialData?.category || '',
+    duration: initialData?.duration || '',
     thumbnail: null,
   });
 
-  const [thumbnailPreview, setThumbnailPreview] = useState(null);
+  const [thumbnailPreview, setThumbnailPreview] = useState(initialData?.thumbnail || null);
 
   const categories = ['Web Development', 'Data Science', 'AI/ML', 'Design', 'Marketing'];
+
+  useEffect(() => {
+    if (mode === 'edit' && initialData?.thumbnail) {
+      setThumbnailPreview(initialData.thumbnail); // backend URL
+    }
+  }, [mode, initialData]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -72,8 +84,8 @@ const CreateCourse = () => {
           boxShadow: '0 4px 20px rgba(0,0,0,0.06)',
         }}
       >
-        <Typography variant="h4" fontWeight="bold" mb={1}>
-          Create Course
+        <Typography variant="h4" fontWeight="bold">
+          {mode === 'create' ? 'Create Course' : 'Edit Course'}
         </Typography>
         <Typography variant="body1" color="text.secondary" mb={3}>
           Fill the details below to publish your course.
@@ -172,9 +184,9 @@ const CreateCourse = () => {
           </Box>
 
           <Box display="flex" justifyContent="flex-end" mt={2}>
-            <Button type="submit" variant="contained" color="primary" size="large" sx={{ px: 4 }}>
-              Create Course
-            </Button>
+             <Button type="submit" variant="contained">
+        {mode === 'create' ? 'Create Course' : 'Update Course'}
+      </Button>
           </Box>
         </Box>
       </Box>

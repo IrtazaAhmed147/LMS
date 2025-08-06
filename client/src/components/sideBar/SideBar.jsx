@@ -26,7 +26,7 @@ const SideBar = ({ drawerWidth, mobileOpen, handleDrawerToggle, isMobile }) => {
     { url: '/', name: 'Dashboard', icon: <DashboardIcon /> },
     { url: '/course', name: 'Courses', icon: <MenuBookIcon /> },
     { url: '/course/enrolled/:id', name: 'Enrolled Courses', icon: <PlaylistAddCheckIcon /> },
-    { url: '/create-course', name: 'Create Course', icon: <AddBoxIcon /> },
+    { url: '/single/course/create', name: 'Create Course', icon: <AddBoxIcon /> },
     { url: '/course/teacher/:id', name: 'Your All Course', icon: <LibraryBooksIcon /> },
   ];
 

@@ -108,55 +108,12 @@ const YourCourses = () => {
           {[1, 2, 3, 4].map((id) => (
             <Box key={id} position="relative">
               <CourseCard />
-              {/* Teacher Actions */}
-              <Box
-                position="absolute"
-                top={8}
-                right={8}
-                display="flex"
-                flexDirection="column"
-                gap={1}
-              >
-                <Tooltip title="Edit Course">
-                  <IconButton size="small" sx={{ bgcolor: 'white' }}>
-                    <EditIcon fontSize="small" />
-                  </IconButton>
-                </Tooltip>
-                <Tooltip title="Delete Course">
-                  <IconButton
-                    size="small"
-                    sx={{ bgcolor: 'white' }}
-                    onClick={() => handleDeleteClick(id)}
-                  >
-                    <DeleteIcon fontSize="small" color="error" />
-                  </IconButton>
-                </Tooltip>
-                <Tooltip title="View Enrolled Students">
-                  <IconButton size="small" sx={{ bgcolor: 'white' }}>
-                    <PeopleIcon fontSize="small" color="primary" />
-                  </IconButton>
-                </Tooltip>
-              </Box>
             </Box>
           ))}
         </Box>
       </Container>
 
-      {/* Delete Confirmation Modal */}
-      <Dialog open={openDeleteModal} onClose={handleCancelDelete}>
-        <DialogTitle>Confirm Delete</DialogTitle>
-        <DialogContent>
-          <DialogContentText>
-            Are you sure you want to delete this course? This action cannot be undone.
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleCancelDelete}>Cancel</Button>
-          <Button onClick={handleConfirmDelete} color="error" variant="contained">
-            Delete
-          </Button>
-        </DialogActions>
-      </Dialog>
+      
     </Box>
   );
 };

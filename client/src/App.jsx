@@ -11,6 +11,7 @@ import CreateCourse from './pages/createCourse/CreateCourse.jsx';
 import SingleCourse from './pages/singleCourse/SingleCourse.jsx';
 import EnrolledCourses from './pages/enrolledCourses/EnrolledCourses.jsx';
 import YourCourses from './pages/yourCourses/YourCourses.jsx';
+import LessonForm from './pages/createLesson/LessonForm.jsx';
 
 function App() {
   return (
@@ -35,10 +36,12 @@ function App() {
         <Route element={<Layout />}>
           <Route index element={<Home />} />
           <Route path='/course' element={<Course />} />
-          <Route path='/create-course' element={<CreateCourse />} />
+          <Route path='/single/course/:mode' element={<CreateCourse />} />
           <Route path='/course/:id' element={<SingleCourse />} />
           <Route path='/course/enrolled/:id' element={<EnrolledCourses />} />
           <Route path='/course/teacher/:id' element={<YourCourses />} />
+          <Route path='/lesson/create' element={<LessonForm />} />
+          <Route path="/lesson/edit/:lessonId" element={<LessonForm />} />
         </Route>
 
 

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   Box,
   Typography,
@@ -12,8 +12,13 @@ import {
   ListItem,
   ListItemText,
   Paper,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
 } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import { Link, useNavigate } from 'react-router-dom';
 
 const lessons = [
   'Introduction to React',
@@ -40,11 +45,25 @@ const relatedCourses = [
 ];
 
 const SingleCourse = () => {
+  const navigate = useNavigate();
+
+  // Course delete modal
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+
+  // Lesson delete modal
+  const [lessonDeleteModalOpen, setLessonDeleteModalOpen] = useState(false);
+  const [lessonToDelete, setLessonToDelete] = useState(null);
+
+  const handleLessonDelete = (lesson) => {
+    setLessonToDelete(lesson);
+    setLessonDeleteModalOpen(true);
+  };
+
   return (
     <Box
       sx={{
         minHeight: '100vh',
-        width: 'calc(100vw - 265px)',
+        width: '100%',
         pt: 8,
         px: 4,
         bgcolor: '#f5f5f5',
@@ -77,17 +96,49 @@ const SingleCourse = () => {
         </Box>
       </Box>
 
-      {/* Divider */}
       <Divider sx={{ my: 4 }} />
+
+      {/* Teacher controls */}
+      <Box display="flex" gap={2} mb={4}>
+        <Link to={'/single/course/edit'}>
+          <Button variant="contained" color="primary">
+            Edit Course
+          </Button>
+        </Link>
+        <Button variant="outlined" color="error" onClick={() => setDeleteModalOpen(true)}>
+          Delete Course
+        </Button>
+        <Link to={'/lesson/create'}>
+          <Button variant="contained" color="secondary">
+            Add Lesson
+          </Button>
+        </Link>
+      </Box>
+
+      {/* Course delete modal */}
+      <Dialog open={deleteModalOpen} onClose={() => setDeleteModalOpen(false)}>
+        <DialogTitle>Confirm Delete</DialogTitle>
+        <DialogContent>
+          <Typography>
+            Are you sure you want to delete this course? This action cannot be undone.
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setDeleteModalOpen(false)}>Cancel</Button>
+          <Button color="error" variant="contained">
+            Delete
+          </Button>
+        </DialogActions>
+      </Dialog>
 
       {/* 2. About Course */}
       <Typography variant="h5" fontWeight="bold" mb={2}>
         About This Course
       </Typography>
       <Typography mb={4}>
-        This course is designed for beginners who want to learn React.js and build modern web apps. You'll
-        start from the basics and gradually progress to advanced concepts like state management, routing,
-        and performance optimization.
+        This course is designed for beginners who want to learn React.js and build modern web apps.
+        You'll start from the basics and gradually progress to advanced concepts like state
+        management, routing, and performance optimization.
       </Typography>
 
       {/* 3. Lessons */}
@@ -96,11 +147,49 @@ const SingleCourse = () => {
       </Typography>
       <List sx={{ mb: 4 }}>
         {lessons.map((lesson, index) => (
-          <ListItem key={index}>
+          <ListItem
+            key={index}
+            secondaryAction={
+              <Box display="flex" gap={1}>
+                <Button
+                  variant="outlined"
+                  size="small"
+                  color="primary"
+                  onClick={() => navigate(`/lesson/edit/${index}`)}
+                >
+                  Edit
+                </Button>
+                <Button
+                  variant="outlined"
+                  size="small"
+                  color="error"
+                  onClick={() => handleLessonDelete(lesson)}
+                >
+                  Delete
+                </Button>
+              </Box>
+            }
+          >
             <ListItemText primary={`Lesson ${index + 1}: ${lesson}`} />
           </ListItem>
         ))}
       </List>
+
+      {/* Lesson delete modal */}
+      <Dialog open={lessonDeleteModalOpen} onClose={() => setLessonDeleteModalOpen(false)}>
+        <DialogTitle>Confirm Lesson Delete</DialogTitle>
+        <DialogContent>
+          <Typography>
+            Are you sure you want to delete "{lessonToDelete}"? This action cannot be undone.
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setLessonDeleteModalOpen(false)}>Cancel</Button>
+          <Button color="error" variant="contained">
+            Delete
+          </Button>
+        </DialogActions>
+      </Dialog>
 
       {/* 4. Instructor */}
       <Typography variant="h5" fontWeight="bold" mb={2}>
@@ -139,36 +228,8 @@ const SingleCourse = () => {
         Reviews
       </Typography>
       <Typography mb={2}>⭐️⭐️⭐️⭐️⭐️ 4.9 (120 reviews)</Typography>
-      {/* You can add real reviews using cards later */}
 
-      <Divider sx={{ my: 4 }} />
-
-      {/* 7. FAQs */}
-      <Typography variant="h5" fontWeight="bold" mb={2}>
-        Frequently Asked Questions
-      </Typography>
-      {faqs.map((faq, idx) => (
-        <Accordion key={idx} sx={{ mb: 1 }}>
-          <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-            <Typography fontWeight="medium">{faq.question}</Typography>
-          </AccordionSummary>
-          <AccordionDetails>
-            <Typography>{faq.answer}</Typography>
-          </AccordionDetails>
-        </Accordion>
-      ))}
-
-      {/* 8. Related Courses */}
-      <Typography variant="h5" fontWeight="bold" mt={6} mb={2}>
-        Related Courses
-      </Typography>
-      <List>
-        {relatedCourses.map((course, index) => (
-          <ListItem key={index}>
-            <ListItemText primary={course} />
-          </ListItem>
-        ))}
-      </List>
+      
     </Box>
   );
 };
