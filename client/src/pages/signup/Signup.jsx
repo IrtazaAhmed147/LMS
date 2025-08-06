@@ -15,9 +15,9 @@ import { useState } from 'react';
 
 function Signup() {
 
-    const form = useRef({})
+    const form = useRef()
     const navigate = useNavigate()
-    // const [role, setRole] = useState('');
+    const [role, setRole] = useState('student')
     const [showPass, setShowPass] = useState(false)
     const { isLoading, error, user } = useSelector((state) => state.auth)
     const dispatch = useDispatch()
@@ -30,10 +30,11 @@ function Signup() {
 
     const handleForm = async (e) => {
         e.preventDefault()
+            console.log(role);
+            
+        if (!form.current.username.trim() || !form.current.email.trim() || !form.current.password.trim() || !role) return;
         
-        if (!form.current.username.trim() || !form.current.email.trim() || !form.current.password.trim() || !form.current.role) return;
-
-        await dispatch(registerUser(form.current))
+        await dispatch(registerUser(form.current, role))
             .then((msg) => {
                 notify('success', msg)
                 navigate('/login')
@@ -44,9 +45,6 @@ function Signup() {
         setShowPass((prev) => !prev)
     }
 
-    // const handleChange = (event) => {
-    //     setRole(event.target.value);
-    // };
 
     return (
         <>
@@ -81,12 +79,12 @@ function Signup() {
                         <Select
                             labelId="demo-simple-select-label"
                             id="demo-simple-select"
-                            value={form.current.role}
+                            value={role}
                             label="Role"
                             name='role'
-                            onChange={(e) => form.current = { ...form.current, [e.target.name]: e.target.value }}
+                            onChange={(e) =>setRole(e.target.value)}
                         >
-                            <MenuItem value={'student'}>Student</MenuItem>
+                            <MenuItem value={'student'} >Student</MenuItem>
                             <MenuItem value={'teacher'}>Teacher</MenuItem>
                             
                         </Select>

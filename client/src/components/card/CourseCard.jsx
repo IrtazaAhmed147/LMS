@@ -12,7 +12,7 @@ import {
 import image from '../../assets/mern course.jpg';
 import { Link } from 'react-router-dom';
 
-const CourseCard = () => {
+const CourseCard = ({title, description, teacherId, thumbnail, _id}) => {
   return (
     <Card
       sx={{
@@ -34,7 +34,7 @@ const CourseCard = () => {
         <CardMedia
           component="img"
           height="160"
-          image={image}
+          image={thumbnail || image}
           alt="Course Thumbnail"
         />
         <Chip
@@ -48,12 +48,12 @@ const CourseCard = () => {
       {/* Course Details */}
       <CardContent sx={{ flexGrow: 1 }}>
         <Typography variant="subtitle1" fontWeight="bold" gutterBottom>
-          MERN Stack Full Crash Course
+          {title}
         </Typography>
 
         <Typography variant="body2" color="text.secondary" mb={1}>
-          Build complete full-stack apps using MongoDB, Express, React & Node.js.
-        </Typography>
+            {description}
+          </Typography>
 
         {/* Instructor Info */}
         <Stack direction="row" alignItems="center" spacing={1} mb={1}>
@@ -62,7 +62,7 @@ const CourseCard = () => {
             src="https://i.pravatar.cc/100?img=3"
             alt="Instructor"
           />
-          <Typography variant="body2">By John Doe</Typography>
+          <Typography variant="body2">By {teacherId?.username || 'user'}</Typography>
         </Stack>
 
         {/* Duration & Price */}
@@ -77,7 +77,7 @@ const CourseCard = () => {
       </CardContent>
 
       {/* Gradient Footer */}
-          <Link to={'/course/123'}>
+          <Link to={`/course/${_id}`}>
       <Box
         sx={{
           px: 2,

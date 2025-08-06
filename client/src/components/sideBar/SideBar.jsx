@@ -18,27 +18,57 @@ import LoginIcon from '@mui/icons-material/Login';
 import AppRegistrationIcon from '@mui/icons-material/AppRegistration';
 import LogoutIcon from '@mui/icons-material/Logout';
 import LibraryBooksIcon from '@mui/icons-material/LibraryBooks';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+import { notify } from '../../utils/HelperFunctions';
+import { userReset } from '../../redux/slices/authSlice';
 
 const SideBar = ({ drawerWidth, mobileOpen, handleDrawerToggle, isMobile }) => {
+  const { user } = useSelector((state) => state.auth)
+  const dispatch = useDispatch()
+  const navigate = useNavigate()
   const location = useLocation();
-  const list = [
+  let list = [
     { url: '/', name: 'Dashboard', icon: <DashboardIcon /> },
     { url: '/course', name: 'Courses', icon: <MenuBookIcon /> },
-    { url: '/course/enrolled/:id', name: 'Enrolled Courses', icon: <PlaylistAddCheckIcon /> },
-    { url: '/single/course/create', name: 'Create Course', icon: <AddBoxIcon /> },
-    { url: '/course/teacher/:id', name: 'Your All Course', icon: <LibraryBooksIcon /> },
   ];
 
-  const otherInfo = [
+  if (user?.role === 'student') {
+    list.push({ url: `/course/enrolled/${user._id}`, name: 'Enrolled Courses', icon: <PlaylistAddCheckIcon /> });
+  }
+
+  if (user?.role === 'teacher') {
+    list.push(
+      { url: '/single/course/create', name: 'Create Course', icon: <AddBoxIcon /> },
+      { url: `/course/teacher/${user._id}`, name: 'Your All Courses', icon: <LibraryBooksIcon /> }
+    );
+  }
+  let otherInfo = [
     { url: '/profile', name: 'Profile', icon: <PersonIcon /> },
-    // { url: '/login', name: 'login', icon: <LoginIcon /> },
-    // { url: '/signup', name: 'signup', icon: <AppRegistrationIcon /> },
-    { url: '/logout', name: 'logout', icon: <LogoutIcon /> },
   ]
+  if (!user) {
+    otherInfo.push(
+      { url: '/login', name: 'login', icon: <LoginIcon /> },
+      { url: '/signup', name: 'signup', icon: <AppRegistrationIcon /> },
+    )
+  }
+
+  const handleLogout = async () => {
+    try {
+      localStorage.removeItem('user')
+      localStorage.removeItem('token')
+      dispatch(userReset())
+      navigate('/login')
+      notify('success', 'User logged out successfully')
+    } catch (error) {
+      console.log(error);
+      notify('error', error.message)
+
+    }
+  }
 
   const drawerContent = (
-    <Box sx={{ width: drawerWidth, p: 2, marginTop: '64px', minHeight: 'calc(100vh - 64px)',display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+    <Box sx={{ width: drawerWidth, p: 2, marginTop: '64px', minHeight: 'calc(100vh - 64px)', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
       <Box>
 
         <List>
@@ -100,7 +130,30 @@ const SideBar = ({ drawerWidth, mobileOpen, handleDrawerToggle, isMobile }) => {
             </Link>
           );
         })}
+
+        {user && <ListItem disablePadding >
+          <ListItemButton
+            onClick={handleLogout}
+            sx={{
+              borderRadius: 1,
+              mb: 1,
+              color: 'text.primary',
+              '&:hover': {
+                bgcolor: '#e3f2fd',
+              },
+            }}
+          >
+            <ListItemIcon
+              sx={{ color: 'text.secondary' }}
+            >
+              <LogoutIcon />
+            </ListItemIcon>
+            <ListItemText primary={'logout'} />
+          </ListItemButton>
+        </ListItem>}
       </List>
+
+
     </Box>
   );
 

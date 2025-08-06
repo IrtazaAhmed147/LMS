@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   Box,
   TextField,
@@ -11,14 +11,18 @@ import {
   Divider
 } from '@mui/material';
 import { useParams } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
+import { createCourse } from '../../redux/actions/courseActions';
+import { notify } from '../../utils/HelperFunctions';
 
 const CreateCourse = ({ initialData = null }) => {
 
-  const {mode} = useParams()
-  console.log(mode);
-  
+  const { mode } = useParams()
 
-  const [courseData, setCourseData] = useState({
+  console.log(mode);
+
+
+  const courseData = useRef({
     title: initialData?.title || '',
     description: initialData?.description || '',
     category: initialData?.category || '',
@@ -27,8 +31,9 @@ const CreateCourse = ({ initialData = null }) => {
   });
 
   const [thumbnailPreview, setThumbnailPreview] = useState(initialData?.thumbnail || null);
-
+  const dispatch = useDispatch()
   const categories = ['Web Development', 'Data Science', 'AI/ML', 'Design', 'Marketing'];
+  const token = localStorage.getItem('token')
 
   useEffect(() => {
     if (mode === 'edit' && initialData?.thumbnail) {
@@ -38,21 +43,47 @@ const CreateCourse = ({ initialData = null }) => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setCourseData({ ...courseData, [name]: value });
+    courseData.current = { ...courseData.current, [name]: value }
+
   };
 
   const handleThumbnailUpload = (e) => {
     const file = e.target.files[0];
     if (file) {
-      setCourseData({ ...courseData, thumbnail: file });
+      // setCourseData({ ...courseData, thumbnail: file });
+      courseData.current = { ...courseData.current, thumbnail: file }
       setThumbnailPreview(URL.createObjectURL(file));
     }
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log(courseData);
+
+    if (mode === 'create') {
+
+      const formData = new FormData();
+
+      // Append all fields from courseData.current
+      for (const key in courseData.current) {
+        formData.append(key, courseData.current[key]);
+      }
+
+      console.log("FormData values:");
+      for (let [key, value] of formData.entries()) {
+        console.log(key, value);
+      }
+
+      dispatch(createCourse(formData, token)).then((msg) => {
+        notify('success', msg)
+      })
+    } else if (mode === 'edit') {
+      console.log(mode);
+      
+    }
+    // Now you can send formData in an API call
+    // axios.post('/api/course', formData, );
   };
+
 
   useEffect(() => {
     // Cleanup preview URL to avoid memory leaks
@@ -120,7 +151,7 @@ const CreateCourse = ({ initialData = null }) => {
             <InputLabel>Category</InputLabel>
             <Select
               name="category"
-              value={courseData.category}
+              value={courseData.current.category}
               onChange={handleChange}
               label="Category"
             >
@@ -184,9 +215,9 @@ const CreateCourse = ({ initialData = null }) => {
           </Box>
 
           <Box display="flex" justifyContent="flex-end" mt={2}>
-             <Button type="submit" variant="contained">
-        {mode === 'create' ? 'Create Course' : 'Update Course'}
-      </Button>
+            <Button type="submit" variant="contained">
+              {mode === 'create' ? 'Create Course' : 'Update Course'}
+            </Button>
           </Box>
         </Box>
       </Box>

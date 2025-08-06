@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import './course.css';
 import {
   Box,
@@ -13,8 +13,28 @@ import {
 } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import CourseCard from '../../components/card/CourseCard';
-
+import { useDispatch, useSelector } from 'react-redux';
+import { getAllCourse } from '../../redux/actions/courseActions';
 function Course() {
+
+  const dispatch = useDispatch()
+  const {course, isLoading, error} = useSelector((state)=> state.course)
+  const searchValue = useRef('')
+  useEffect(()=> {
+    dispatch(getAllCourse())
+  },[])
+
+  const handleSearch = async()=> {
+    try {
+       dispatch(getAllCourse({title: searchValue.current}))
+      console.log(searchValue);
+    } catch (error) {
+        console.log(error);
+        
+    }
+    
+  }
+
   return (
     <Box flex={1} bgcolor="#f5f5f5" minHeight="100vh" py={4} px={1}>
       <Container sx={{padding: '10px !important'}}>
@@ -42,9 +62,11 @@ function Course() {
               <InputBase
                 placeholder="Search courses..."
                 fullWidth
+                onChange={(e)=> searchValue.current = e.target.value}
                 sx={{ fontSize: 14 }}
               />
-              <IconButton type="submit">
+              
+              <IconButton onClick={handleSearch}>
                 <SearchIcon />
               </IconButton>
             </Box>
@@ -76,12 +98,11 @@ function Course() {
 
         {/* Course Cards */}
         <Box display="flex" gap={2} flexWrap="wrap">
-          <CourseCard />
-          <CourseCard />
-          <CourseCard />
-          <CourseCard />
-          {/* Add more cards dynamically */}
-        </Box>
+          {isLoading ? 'loading':course?.map((value)=> (
+
+          <CourseCard {...value} key={value._id} />
+          ))}
+          </Box>
       </Container>
     </Box>
   );
