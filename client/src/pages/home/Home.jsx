@@ -7,13 +7,13 @@ import LessonCard from '../../components/card/LessonCard';
 
 function Home() {
   return (
-    <Box display="flex">
+    <>
       {/* Sidebar */}
-      <Sidebar />
+      {/* <Sidebar /> */}
 
       {/* Main Content */}
-      <Box flex={1} bgcolor="#f5f5f5" minHeight="100vh" py={3} px={4}>
-        <Container maxWidth="xl">
+      <Box flex={1} bgcolor="#f5f5f5" minHeight="100vh" py={3} px={1}>
+        <Container sx={{padding:'10px'}}>
           
           {/* Dashboard Stats */}
           <Typography variant="h5" fontWeight="bold" mb={2}>
@@ -55,7 +55,7 @@ function Home() {
           </Box>
         </Container>
       </Box>
-    </Box>
+    </>
   );
 }
 

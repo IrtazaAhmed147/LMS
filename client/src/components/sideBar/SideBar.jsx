@@ -1,51 +1,79 @@
+import React from 'react';
 import {
+  Drawer,
+  Box,
   List,
   ListItem,
-  ListItemButton,
   ListItemIcon,
   ListItemText,
-  Box,
-  Typography
+  Divider,
+  ListItemButton
 } from '@mui/material';
-import React from 'react';
-import { Link, useLocation } from 'react-router-dom';
-
-// MUI Icons (you can change icons as needed)
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import MenuBookIcon from '@mui/icons-material/MenuBook';
 import PlaylistAddCheckIcon from '@mui/icons-material/PlaylistAddCheck';
 import AddBoxIcon from '@mui/icons-material/AddBox';
+import PersonIcon from '@mui/icons-material/Person';
+import LoginIcon from '@mui/icons-material/Login';
+import AppRegistrationIcon from '@mui/icons-material/AppRegistration';
+import LogoutIcon from '@mui/icons-material/Logout';
 import LibraryBooksIcon from '@mui/icons-material/LibraryBooks';
-import AccountCircleIcon from '@mui/icons-material/AccountCircle';
+import { Link, useLocation } from 'react-router-dom';
 
-function SideBar() {
+const SideBar = ({ drawerWidth, mobileOpen, handleDrawerToggle, isMobile }) => {
   const location = useLocation();
-
   const list = [
     { url: '/', name: 'Dashboard', icon: <DashboardIcon /> },
-    { url: '/courses', name: 'Courses', icon: <MenuBookIcon /> },
-    { url: '/enrolled', name: 'Enrolled Courses', icon: <PlaylistAddCheckIcon /> },
+    { url: '/course', name: 'Courses', icon: <MenuBookIcon /> },
+    { url: '/course/enrolled/:id', name: 'Enrolled Courses', icon: <PlaylistAddCheckIcon /> },
     { url: '/create-course', name: 'Create Course', icon: <AddBoxIcon /> },
-    { url: '/all-courses', name: 'Your All Course', icon: <LibraryBooksIcon /> },
-    { url: '/profile', name: 'Profile', icon: <AccountCircleIcon /> },
+    { url: '/course/teacher/:id', name: 'Your All Course', icon: <LibraryBooksIcon /> },
   ];
 
-  return (
-    <Box
-      sx={{
-        width: 250,
-        borderRight: '1px solid #e0e0e0',
-        minHeight: '100vh',
-        bgcolor: '#f9f9f9',
-        p: 2,
-      }}
-    >
-      <Typography variant="h6" fontWeight="bold" sx={{ mb: 2 }}>
-        LMS Panel
-      </Typography>
+  const otherInfo = [
+    { url: '/profile', name: 'Profile', icon: <PersonIcon /> },
+    // { url: '/login', name: 'login', icon: <LoginIcon /> },
+    // { url: '/signup', name: 'signup', icon: <AppRegistrationIcon /> },
+    { url: '/logout', name: 'logout', icon: <LogoutIcon /> },
+  ]
 
+  const drawerContent = (
+    <Box sx={{ width: drawerWidth, p: 2, marginTop: '64px', minHeight: 'calc(100vh - 64px)',display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+      <Box>
+
+        <List>
+          {list.map((item, i) => {
+            const isActive = location.pathname === item.url;
+            return (
+              <Link to={item.url} key={i} style={{ textDecoration: 'none' }}>
+                <ListItem disablePadding>
+                  <ListItemButton
+                    selected={isActive}
+                    sx={{
+                      borderRadius: 1,
+                      mb: 1,
+                      color: isActive ? 'primary.main' : 'text.primary',
+                      '&:hover': {
+                        bgcolor: '#e3f2fd',
+                      },
+                    }}
+                  >
+                    <ListItemIcon
+                      sx={{ color: isActive ? 'primary.main' : 'text.secondary' }}
+                    >
+                      {item.icon}
+                    </ListItemIcon>
+                    <ListItemText primary={item.name} />
+                  </ListItemButton>
+                </ListItem>
+              </Link>
+            );
+          })}
+        </List>
+        <Divider />
+      </Box>
       <List>
-        {list.map((item, i) => {
+        {otherInfo.map((item, i) => {
           const isActive = location.pathname === item.url;
           return (
             <Link to={item.url} key={i} style={{ textDecoration: 'none' }}>
@@ -75,6 +103,48 @@ function SideBar() {
       </List>
     </Box>
   );
-}
+
+  return (
+    <>
+      {/* Mobile Drawer */}
+      {isMobile && (
+        <Drawer
+          variant="temporary"
+          open={mobileOpen}
+          onClose={handleDrawerToggle}
+          ModalProps={{ keepMounted: true }}
+          sx={{
+            display: { xs: 'block', sm: 'block', md: 'none' },
+            '& .MuiDrawer-paper': {
+              width: drawerWidth,
+              overflow: 'hidden',
+            },
+          }}
+        >
+          {drawerContent}
+        </Drawer>
+      )}
+
+      {/* Desktop Drawer */}
+      {!isMobile && (
+        <Drawer
+          variant="permanent"
+          sx={{
+            width: drawerWidth,
+            flexShrink: 0,
+            '& .MuiDrawer-paper': {
+              width: drawerWidth,
+              overflow: 'hidden',
+              boxSizing: 'border-box',
+            },
+          }}
+          open
+        >
+          {drawerContent}
+        </Drawer>
+      )}
+    </>
+  );
+};
 
 export default SideBar;

@@ -6,6 +6,11 @@ import Login from './pages/login/Login.jsx';
 import Signup from './pages/signup/Signup.jsx';
 import Otp from './pages/otp/Otp.jsx';
 import NotFound from './pages/notFound/NotFound.jsx';
+import Course from './pages/course/Course.jsx';
+import CreateCourse from './pages/createCourse/CreateCourse.jsx';
+import SingleCourse from './pages/singleCourse/SingleCourse.jsx';
+import EnrolledCourses from './pages/enrolledCourses/EnrolledCourses.jsx';
+import YourCourses from './pages/yourCourses/YourCourses.jsx';
 
 function App() {
   return (
@@ -29,6 +34,11 @@ function App() {
 
         <Route element={<Layout />}>
           <Route index element={<Home />} />
+          <Route path='/course' element={<Course />} />
+          <Route path='/create-course' element={<CreateCourse />} />
+          <Route path='/course/:id' element={<SingleCourse />} />
+          <Route path='/course/enrolled/:id' element={<EnrolledCourses />} />
+          <Route path='/course/teacher/:id' element={<YourCourses />} />
         </Route>
 
 

@@ -1,29 +1,98 @@
 import React from 'react';
-import { Card, CardMedia, CardContent, Typography, Box, Chip } from '@mui/material';
+import {
+  Card,
+  CardMedia,
+  CardContent,
+  Typography,
+  Box,
+  Chip,
+  Avatar,
+  Stack,
+} from '@mui/material';
+import image from '../../assets/mern course.jpg';
+import { Link } from 'react-router-dom';
 
 const CourseCard = () => {
   return (
-    <Card sx={{ width: 250, borderRadius: 2, boxShadow: 3, overflow: 'hidden' }}>
+    <Card
+      sx={{
+        width: 270,
+        borderRadius: 3,
+        boxShadow: 4,
+        transition: 'transform 0.3s, box-shadow 0.3s',
+        '&:hover': {
+          transform: 'scale(1.03)',
+          boxShadow: 6,
+        },
+        overflow: 'hidden',
+        display: 'flex',
+        flexDirection: 'column',
+      }}
+    >
+      {/* Image with badge */}
       <Box sx={{ position: 'relative' }}>
         <CardMedia
           component="img"
-          height="140"
-          image="/images/excel-course.png" // Change to your actual image path
-          alt="Excel Crash Course"
+          height="160"
+          image={image}
+          alt="Course Thumbnail"
         />
         <Chip
           label="New"
-          color="primary"
+          color="secondary"
           size="small"
-          sx={{ position: 'absolute', top: 8, right: 8 }}
+          sx={{ position: 'absolute', top: 10, right: 10 }}
         />
       </Box>
-      <CardContent sx={{ background: 'linear-gradient(to top, #003049, #0077b6)', color: 'white' }}>
-        <Typography variant="body2" fontWeight="bold">
-          MERN Stack development full crash course: <br />
-          best course in 2025   
+
+      {/* Course Details */}
+      <CardContent sx={{ flexGrow: 1 }}>
+        <Typography variant="subtitle1" fontWeight="bold" gutterBottom>
+          MERN Stack Full Crash Course
         </Typography>
+
+        <Typography variant="body2" color="text.secondary" mb={1}>
+          Build complete full-stack apps using MongoDB, Express, React & Node.js.
+        </Typography>
+
+        {/* Instructor Info */}
+        <Stack direction="row" alignItems="center" spacing={1} mb={1}>
+          <Avatar
+            sx={{ width: 28, height: 28 }}
+            src="https://i.pravatar.cc/100?img=3"
+            alt="Instructor"
+          />
+          <Typography variant="body2">By John Doe</Typography>
+        </Stack>
+
+        {/* Duration & Price */}
+        <Stack direction="row" justifyContent="space-between">
+          <Typography variant="body2" color="text.secondary">
+            ⏱️ 8 Weeks
+          </Typography>
+          {/* <Typography variant="body2" fontWeight="bold" color="primary">
+            Rs. 3,999
+          </Typography> */}
+        </Stack>
       </CardContent>
+
+      {/* Gradient Footer */}
+          <Link to={'/course/123'}>
+      <Box
+        sx={{
+          px: 2,
+          py: 1,
+          background: 'linear-gradient(to right, #0077b6, #00b4d8)',
+          color: 'white',
+          textAlign: 'center',
+        }}
+      >
+        <Typography variant="caption" fontWeight="bold">
+      
+          Enroll Now
+        </Typography>
+      </Box>
+          </Link>
     </Card>
   );
 };
