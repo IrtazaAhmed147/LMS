@@ -4,9 +4,10 @@ import { uploadOnCloudinary } from "../utils/cloudinary.js";
 import { errorHandler, successHandler } from "../utils/responseHandler.js";
 
 export const getAllCourses = async (req, res) => {
-    const { title, limit } = req.query;
+    const { title, limit, category } = req.query;
     const filter = {};
     if (title) filter.title = { $regex: title, $options: 'i' };
+    if (category) filter.category = { $regex: category, $options: 'i' };
     try {
         const courses = await Course.find(filter).populate("teacherId", "username email profilePic").limit(Number(limit))
         successHandler(res, 200, "All courses fetched", courses)
@@ -17,7 +18,7 @@ export const getAllCourses = async (req, res) => {
 }
 export const getSpecificCourse = async (req, res) => {
     try {
-        const courses = await Course.findOne(req.params.id).populate("teacherId", "username email profilePic").limit(Number(limit))
+        const courses = await Course.findOne({_id:req.params.id}).populate("teacherId", "username email profilePic")
         successHandler(res, 200, "All courses fetched", courses)
     }
     catch (err) {
@@ -38,17 +39,17 @@ export const getTeacherCourses = async (req, res) => {
 }
 
 export const createCourse = async (req, res) => {
-    const { title, description } = req.body
+    const { title, description, category } = req.body
     const file = req.file
     
     try {
-        if (!title || !description) return errorHandler(res, 400, "missing fields")
+        if (!title || !description || !category) return errorHandler(res, 400, "missing fields")
         if (file) {
             const url = await uploadOnCloudinary(file, 'course-images');
             req.body.thumbnail = url.secure_url
         }
         const courseData = await Course({
-            title, description, teacherId: req.user.id, thumbnail: req.body.thumbnail
+            title, description, category,teacherId: req.user.id, thumbnail: req.body.thumbnail
         })
         await courseData.save()
         await User.findByIdAndUpdate(req.user.id, {

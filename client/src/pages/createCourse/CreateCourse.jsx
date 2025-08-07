@@ -11,41 +11,48 @@ import {
   Divider
 } from '@mui/material';
 import { useParams } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
-import { createCourse } from '../../redux/actions/courseActions';
+import { useDispatch, useSelector } from 'react-redux';
+import { createCourse, getSpecificCourse, updateCourse } from '../../redux/actions/courseActions';
 import { notify } from '../../utils/HelperFunctions';
 
-const CreateCourse = ({ initialData = null }) => {
+const CreateCourse = () => {
 
-  const { mode } = useParams()
+  const { mode, id } = useParams()
 
   console.log(mode);
+  const dispatch = useDispatch()
+  const { singleCourse } = useSelector((state) => state.course)
+  const token = localStorage.getItem('token')
+  useEffect(() => {
 
+    if (mode === 'edit' && id) {
+      dispatch(getSpecificCourse(id, token))
+    }
+  }, [])
 
   const courseData = useRef({
-    title: initialData?.title || '',
-    description: initialData?.description || '',
-    category: initialData?.category || '',
-    duration: initialData?.duration || '',
+    title: singleCourse?.title || '',
+    description: singleCourse?.description || '',
+    category: singleCourse?.category || '',
+    duration: singleCourse?.duration || '',
     thumbnail: null,
   });
+  console.log(courseData);
 
-  const [thumbnailPreview, setThumbnailPreview] = useState(initialData?.thumbnail || null);
-  const dispatch = useDispatch()
+  const [thumbnailPreview, setThumbnailPreview] = useState(singleCourse?.thumbnail || null);
   const categories = ['Web Development', 'Data Science', 'AI/ML', 'Design', 'Marketing'];
-  const token = localStorage.getItem('token')
 
   useEffect(() => {
-    if (mode === 'edit' && initialData?.thumbnail) {
-      setThumbnailPreview(initialData.thumbnail); // backend URL
+    if (mode === 'edit' && singleCourse?.thumbnail) {
+      setThumbnailPreview(singleCourse.thumbnail); // backend URL
     }
-  }, [mode, initialData]);
+  }, [mode, singleCourse]);
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    courseData.current = { ...courseData.current, [name]: value }
+  // const (e)=> courseData.current = {...courseData.current, [e.target.name]: e.target.value} = (e) => {
+  //   const { name, value } = e.target;
+  //   courseData.current = { ...courseData.current, [name]: value }
 
-  };
+  // };
 
   const handleThumbnailUpload = (e) => {
     const file = e.target.files[0];
@@ -59,27 +66,28 @@ const CreateCourse = ({ initialData = null }) => {
   const handleSubmit = (e) => {
     e.preventDefault();
 
+
+    const formData = new FormData();
+
+    // Append all fields from courseData.current
+    for (const key in courseData.current) {
+      formData.append(key, courseData.current[key]);
+    }
+
     if (mode === 'create') {
 
-      const formData = new FormData();
-
-      // Append all fields from courseData.current
-      for (const key in courseData.current) {
-        formData.append(key, courseData.current[key]);
-      }
-
-      console.log("FormData values:");
-      for (let [key, value] of formData.entries()) {
-        console.log(key, value);
-      }
 
       dispatch(createCourse(formData, token)).then((msg) => {
         notify('success', msg)
       })
     } else if (mode === 'edit') {
       console.log(mode);
-      
+      dispatch(updateCourse(formData, token, singleCourse._id)).then((msg) => {
+        notify('success', msg)
+      })
+
     }
+
     // Now you can send formData in an API call
     // axios.post('/api/course', formData, );
   };
@@ -128,8 +136,8 @@ const CreateCourse = ({ initialData = null }) => {
           <TextField
             label="Course Title"
             name="title"
-            value={courseData.title}
-            onChange={handleChange}
+            // value={courseData.current.title}
+            onChange={(e)=> courseData.current = {...courseData.current, [e.target.name]: e.target.value}}
             placeholder="e.g., Advanced React for Beginners"
             fullWidth
             required
@@ -138,8 +146,8 @@ const CreateCourse = ({ initialData = null }) => {
           <TextField
             label="Description"
             name="description"
-            value={courseData.description}
-            onChange={handleChange}
+            // value={courseData.current.description}
+            onChange={(e)=> courseData.current = {...courseData.current, [e.target.name]: e.target.value}}
             placeholder="Describe your course..."
             multiline
             rows={5}
@@ -147,12 +155,12 @@ const CreateCourse = ({ initialData = null }) => {
             required
           />
 
-          <FormControl fullWidth required>
+          <FormControl fullWidth>
             <InputLabel>Category</InputLabel>
             <Select
               name="category"
-              value={courseData.current.category}
-              onChange={handleChange}
+              // value={courseData.current.category}
+              onChange={(e)=> courseData.current = {...courseData.current, [e.target.name]: e.target.value}}
               label="Category"
             >
               {categories.map((cat, i) => (
@@ -166,8 +174,8 @@ const CreateCourse = ({ initialData = null }) => {
           <TextField
             label="Estimated Duration"
             name="duration"
-            value={courseData.duration}
-            onChange={handleChange}
+            // value={courseData.duration}
+            onChange={(e)=> courseData.current = {...courseData.current, [e.target.name]: e.target.value}}
             placeholder="e.g., 4 hours"
             fullWidth
             required

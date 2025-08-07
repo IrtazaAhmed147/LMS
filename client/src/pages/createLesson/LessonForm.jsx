@@ -1,62 +1,77 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import {
-  Box, Typography, Button, TextField, MenuItem, InputLabel,
-  FormControl, Select, Divider
+  Box, Typography, Button, TextField, Divider
 } from '@mui/material';
+import { useDispatch } from 'react-redux';
+import { createLesson } from '../../redux/actions/lessonActions';
+import { notify } from '../../utils/HelperFunctions';
 
 const LessonForm = () => {
-  const { lessonId } = useParams(); // undefined if create mode
+  const { lessonId, courseId } = useParams();
   const isEdit = Boolean(lessonId);
-  console.log(lessonId);
-  
+  const dispatch = useDispatch();
+  const token = localStorage.getItem('token');
+
   const [lessonData, setLessonData] = useState({
     title: '',
-    contentType: '',
-    contentUrl: '',
     duration: '',
+    contentType: 'image',
+    contentUrl: [],
   });
-
-  const contentTypes = ['video', 'pdf', 'article'];
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setLessonData({ ...lessonData, [name]: value });
   };
 
+  const handleImageChange = (e) => {
+    setLessonData({ ...lessonData, contentUrl: Array.from(e.target.files) });
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
+    const formData = new FormData();
+    formData.append('title', lessonData.title);
+    formData.append('duration', lessonData.duration);
+    formData.append('courseId', courseId);
+    formData.append('contentType', 'image');
+
+    lessonData.contentUrl.forEach((img, i) => {
+      formData.append('contentUrl', img); // or `contentUrl[]` depending on backend
+    });
+    console.log(lessonData);
+    
+
     if (isEdit) {
-      console.log('Updating lesson:', lessonData);
-      // Call API for update
+      // update logic
     } else {
-      console.log('Creating lesson:', lessonData);
-      // Call API for create
+      dispatch(createLesson(formData, token)).then((msg) =>
+        notify('success', msg)
+      ).catch((err)=> notify('error', err))
     }
   };
 
   useEffect(() => {
     if (isEdit) {
-      // Fetch existing lesson data here
-      // Example:
-      // fetch(`/api/lessons/${lessonId}`).then(res => res.json()).then(data => setLessonData(data));
+      // Set existing data here if editing
       setLessonData({
-        title: 'State and Props',
-        contentType: 'video',
-        contentUrl: 'https://youtube.com/example',
-        duration: '12 mins'
+        title: 'Sample Lesson',
+        duration: '10 mins',
+        contentType: 'image',
+        contentUrl: [], // preload if needed
       });
     }
-  }, [isEdit, lessonId]);
+  }, [isEdit]);
 
   return (
-    <Box sx={{ minHeight: '100vh', px: 2, py: 6, bgcolor: '#f9f9f9', overflowY: 'auto' }}>
+    <Box sx={{ minHeight: '100vh', px: 2, py: 6, bgcolor: '#f9f9f9' }}>
       <Box sx={{ maxWidth: '800px', mx: 'auto', p: 4, backgroundColor: 'white', borderRadius: 3, boxShadow: '0 4px 20px rgba(0,0,0,0.06)' }}>
         <Typography variant="h4" fontWeight="bold" mb={1}>
           {isEdit ? 'Edit Lesson' : 'Create Lesson'}
         </Typography>
         <Typography variant="body1" color="text.secondary" mb={3}>
-          {isEdit ? 'Update the lesson details below.' : 'Fill in the lesson details below.'}
+          Upload contentUrl related to your lesson.
         </Typography>
 
         <Divider sx={{ mb: 4 }} />
@@ -67,32 +82,7 @@ const LessonForm = () => {
             name="title"
             value={lessonData.title}
             onChange={handleChange}
-            placeholder="e.g., Introduction to React"
-            fullWidth
-            required
-          />
-
-          <FormControl fullWidth required>
-            <InputLabel>Content Type</InputLabel>
-            <Select
-              name="contentType"
-              value={lessonData.contentType}
-              onChange={handleChange}
-            >
-              {contentTypes.map((type, i) => (
-                <MenuItem key={i} value={type}>
-                  {type.charAt(0).toUpperCase() + type.slice(1)}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-
-          <TextField
-            label="Content URL"
-            name="contentUrl"
-            value={lessonData.contentUrl}
-            onChange={handleChange}
-            placeholder="Paste the video/PDF/article link here"
+            placeholder="e.g., JavaScript Basics"
             fullWidth
             required
           />
@@ -106,6 +96,30 @@ const LessonForm = () => {
             fullWidth
             required
           />
+
+          <Button variant="outlined" component="label">
+            Upload contentUrl
+            <input
+              type="file"
+              hidden
+              multiple
+              accept="image/*"
+              onChange={handleImageChange}
+            />
+          </Button>
+
+          {lessonData.contentUrl.length > 0 && (
+            <Box>
+              <Typography variant="body2" color="text.secondary">
+                {lessonData.contentUrl.length} image(s) selected
+              </Typography>
+              <ul style={{ paddingLeft: 20 }}>
+                {lessonData.contentUrl.map((file, idx) => (
+                  <li key={idx}>{file.name}</li>
+                ))}
+              </ul>
+            </Box>
+          )}
 
           <Box display="flex" justifyContent="flex-end" mt={2}>
             <Button type="submit" variant="contained" color="primary" size="large" sx={{ px: 4 }}>

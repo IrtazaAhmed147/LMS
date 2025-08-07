@@ -36,12 +36,12 @@ function App() {
         <Route element={<Layout />}>
           <Route index element={<Home />} />
           <Route path='/course' element={<Course />} />
-          <Route path='/single/course/:mode' element={<CreateCourse />} />
+          <Route path='/single/course/:mode/:id' element={<CreateCourse />} />
           <Route path='/course/:id' element={<SingleCourse />} />
           <Route path='/course/enrolled/:id' element={<EnrolledCourses />} />
           <Route path='/course/teacher/:id' element={<YourCourses />} />
-          <Route path='/lesson/create' element={<LessonForm />} />
-          <Route path="/lesson/edit/:lessonId" element={<LessonForm />} />
+          <Route path='/lesson/create/:courseId' element={<LessonForm />} />
+          <Route path="/lesson/edit/:courseId/:lessonId" element={<LessonForm />} />
         </Route>
 
 

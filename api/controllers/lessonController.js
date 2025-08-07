@@ -26,13 +26,17 @@ export const getCourseLessons = async (req, res) => {
 
     try {
         const user = await User.findById(req.user.id);
-        
-        const isEnrolled = user.enrolledCourses.find((course)=> {
-           return course.courseId.toString() === req.params.id
+
+        const isEnrolled = user.enrolledCourses.find((course) => {
+            return course.courseId.toString() === req.params.id
         })
+        console.log(req.params.id);
+        
         const isCreator = user.createdCourses.includes(req.params.id);
         const isAdmin = req.user.role === "admin";
-
+        console.log(user.createdCourses);
+        console.log(isCreator);
+        
         if (!isEnrolled && !isCreator && !isAdmin) {
             return res.status(403).json({ message: "Access denied" });
         }
@@ -66,16 +70,29 @@ export const getSpecificLesson = async (req, res) => {
 
 export const createLesson = async (req, res) => {
     const { title, contentType, duration, courseId } = req.body
-    const file = req.file
+    console.log(req.body);
+    
+    const files = req.files
     try {
         if (!title || !contentType || !duration || !courseId) return errorHandler(res, 400, "missing fields")
-        if (file) {
-            const url = await uploadOnCloudinary(file, 'lesson-content');
-            req.body.contentUrl = url.secure_url
+
+        let contentUrls = [];
+
+        if (files && files.length > 0) {
+            for (const file of files) {
+                const result = await uploadOnCloudinary(file, "lesson-content");
+                if (result?.secure_url) {
+                    contentUrls.push(result.secure_url);
+                }
+            }
         }
-        const lessonData = await Lesson({
-            title, contentType, contentUrl: req.body.contentUrl, duration, courseId
-        })
+        const lessonData = new Lesson({
+            title,
+            contentType,
+            contentUrl: contentUrls,
+            duration,
+            courseId,
+        });
         await lessonData.save()
         await CourseModel.findByIdAndUpdate(courseId, {
             $push: { lessons: lessonData._id }
@@ -115,7 +132,7 @@ export const updateLesson = async (req, res) => {
 }
 export const lessonComplete = async (req, res) => {
     try {
-        const {courseId , lessonId }= req.params
+        const { courseId, lessonId } = req.params
         const user = await User.findById(req.user.id);
 
         if (!user) return errorHandler(res, 404, "User not found");

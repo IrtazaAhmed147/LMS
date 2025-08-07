@@ -12,7 +12,7 @@ const lessonSchema = new mongoose.Schema({
         lowercase: true,
     },
     contentUrl: {
-        type: String,
+        type: [String],
         // required: true,
     },
     duration: {

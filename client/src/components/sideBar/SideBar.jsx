@@ -39,7 +39,7 @@ const SideBar = ({ drawerWidth, mobileOpen, handleDrawerToggle, isMobile }) => {
 
   if (user?.role === 'teacher') {
     list.push(
-      { url: '/single/course/create', name: 'Create Course', icon: <AddBoxIcon /> },
+      { url: '/single/course/create/new', name: 'Create Course', icon: <AddBoxIcon /> },
       { url: `/course/teacher/${user._id}`, name: 'Your All Courses', icon: <LibraryBooksIcon /> }
     );
   }

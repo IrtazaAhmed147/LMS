@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Box,
   Typography,
@@ -17,36 +17,27 @@ import {
   DialogContent,
   DialogActions,
 } from '@mui/material';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+import { getSpecificCourse } from '../../redux/actions/courseActions';
+import { getCourselesson } from '../../redux/actions/lessonActions';
 
-const lessons = [
-  'Introduction to React',
-  'JSX & Components',
-  'State and Props',
-  'Hooks Overview',
-];
 
-const faqs = [
-  {
-    question: 'Do I need prior experience?',
-    answer: 'No prior experience required, we start from scratch.',
-  },
-  {
-    question: 'Is the course self-paced?',
-    answer: 'Yes, you can learn at your own pace.',
-  },
-];
-
-const relatedCourses = [
-  'Mastering Redux',
-  'Next.js Essentials',
-  'Full Stack with Node.js',
-];
 
 const SingleCourse = () => {
   const navigate = useNavigate();
+  const { id } = useParams()
+  console.log(id);
+  
+  const dispatch = useDispatch()
+  const { singleCourse } = useSelector((state) => state.course)
+  const { lessons } = useSelector((state) => state.lesson)
+  const token = localStorage.getItem('token')
+  useEffect(() => {
+    dispatch(getSpecificCourse(id, token))
+    dispatch(getCourselesson(id, token))
 
+  }, [])
   // Course delete modal
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
 
@@ -73,7 +64,7 @@ const SingleCourse = () => {
       <Box display="flex" gap={4} mb={4}>
         <Box>
           <img
-            src="/course-thumbnail.jpg"
+            src={singleCourse?.thumbnail || "/course-thumbnail.jpg"}
             alt="course thumbnail"
             style={{
               width: '300px',
@@ -85,10 +76,10 @@ const SingleCourse = () => {
         </Box>
         <Box>
           <Typography variant="h4" fontWeight="bold">
-            Advanced React for Beginners
+            {singleCourse?.title}
           </Typography>
           <Typography color="text.secondary" mb={2}>
-            Category: Web Development
+            Category: {singleCourse?.category || ''}
           </Typography>
           <Typography mt={2} fontWeight="bold">
             Duration: 5 Hours
@@ -100,7 +91,7 @@ const SingleCourse = () => {
 
       {/* Teacher controls */}
       <Box display="flex" gap={2} mb={4}>
-        <Link to={'/single/course/edit'}>
+        <Link to={`/single/course/edit/${singleCourse?._id}`}>
           <Button variant="contained" color="primary">
             Edit Course
           </Button>
@@ -108,7 +99,7 @@ const SingleCourse = () => {
         <Button variant="outlined" color="error" onClick={() => setDeleteModalOpen(true)}>
           Delete Course
         </Button>
-        <Link to={'/lesson/create'}>
+        <Link to={`/lesson/create/${singleCourse?._id}`}>
           <Button variant="contained" color="secondary">
             Add Lesson
           </Button>
@@ -136,9 +127,7 @@ const SingleCourse = () => {
         About This Course
       </Typography>
       <Typography mb={4}>
-        This course is designed for beginners who want to learn React.js and build modern web apps.
-        You'll start from the basics and gradually progress to advanced concepts like state
-        management, routing, and performance optimization.
+        {singleCourse?.description}
       </Typography>
 
       {/* 3. Lessons */}
@@ -146,9 +135,9 @@ const SingleCourse = () => {
         Course Content
       </Typography>
       <List sx={{ mb: 4 }}>
-        {lessons.map((lesson, index) => (
+        {lessons?.length !== 0 && lessons?.map((lesson, index) => (
           <ListItem
-            key={index}
+            key={lesson._id}
             secondaryAction={
               <Box display="flex" gap={1}>
                 <Button
@@ -163,14 +152,14 @@ const SingleCourse = () => {
                   variant="outlined"
                   size="small"
                   color="error"
-                  onClick={() => handleLessonDelete(lesson)}
+                  onClick={() => handleLessonDelete(lesson._id)}
                 >
                   Delete
                 </Button>
               </Box>
             }
           >
-            <ListItemText primary={`Lesson ${index + 1}: ${lesson}`} />
+            <ListItemText primary={`Lesson ${index + 1}: ${lesson.title}`} />
           </ListItem>
         ))}
       </List>
@@ -229,7 +218,7 @@ const SingleCourse = () => {
       </Typography>
       <Typography mb={2}>⭐️⭐️⭐️⭐️⭐️ 4.9 (120 reviews)</Typography>
 
-      
+
     </Box>
   );
 };

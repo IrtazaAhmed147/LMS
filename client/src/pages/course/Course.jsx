@@ -22,6 +22,8 @@ function Course() {
   const searchValue = useRef('')
   useEffect(()=> {
     dispatch(getAllCourse())
+    console.log(course);
+    
   },[])
 
   const handleSearch = async()=> {

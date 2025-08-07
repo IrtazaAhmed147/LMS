@@ -12,7 +12,16 @@ import {
 import image from '../../assets/mern course.jpg';
 import { Link } from 'react-router-dom';
 
-const CourseCard = ({title, description, teacherId, thumbnail, _id}) => {
+const CourseCard = ({title, description, teacherId, thumbnail, _id, createdAt,category}) => {
+
+   const isNew = (() => {
+    if (!createdAt) return false;
+    const createdTime = new Date(createdAt).getTime();
+    const now = Date.now();
+    const diffInHours = (now - createdTime) / (1000 * 60 * 60);
+    return diffInHours <= 24;
+  })();
+
   return (
     <Card
       sx={{
@@ -37,12 +46,14 @@ const CourseCard = ({title, description, teacherId, thumbnail, _id}) => {
           image={thumbnail || image}
           alt="Course Thumbnail"
         />
-        <Chip
-          label="New"
-          color="secondary"
-          size="small"
-          sx={{ position: 'absolute', top: 10, right: 10 }}
-        />
+         {isNew && (
+          <Chip
+            label="New"
+            color="secondary"
+            size="small"
+            sx={{ position: 'absolute', top: 10, right: 10 }}
+          />
+        )}
       </Box>
 
       {/* Course Details */}
@@ -53,6 +64,9 @@ const CourseCard = ({title, description, teacherId, thumbnail, _id}) => {
 
         <Typography variant="body2" color="text.secondary" mb={1}>
             {description}
+          </Typography>
+        <Typography variant="body2" color="text.secondary" mb={1}>
+            category: {category || ''}
           </Typography>
 
         {/* Instructor Info */}
@@ -65,15 +79,6 @@ const CourseCard = ({title, description, teacherId, thumbnail, _id}) => {
           <Typography variant="body2">By {teacherId?.username || 'user'}</Typography>
         </Stack>
 
-        {/* Duration & Price */}
-        <Stack direction="row" justifyContent="space-between">
-          <Typography variant="body2" color="text.secondary">
-            ⏱️ 8 Weeks
-          </Typography>
-          {/* <Typography variant="body2" fontWeight="bold" color="primary">
-            Rs. 3,999
-          </Typography> */}
-        </Stack>
       </CardContent>
 
       {/* Gradient Footer */}

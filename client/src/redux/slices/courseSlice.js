@@ -2,6 +2,7 @@ import { createSlice } from "@reduxjs/toolkit"
 
 const initialState = {
     course:[],
+    singleCourse: {},
     isLoading: false,
     error: false,
 }
@@ -22,6 +23,11 @@ const courseSlice = createSlice({
             state.isLoading = false
             state.error = null
         },
+        singleCourseSuccess: (state,{payload}) => {
+            state.isLoading = false
+            state.error = null
+            state.singleCourse = payload
+        },
         courseFetchFailure: (state, action) => {
             state.isLoading = false;
             state.error = action.payload;
@@ -30,5 +36,5 @@ const courseSlice = createSlice({
     }
 })
 
-export const { courseFetchStart, courseFetchSuccess, courseFetchFailure, courseCreateSuccess, } = courseSlice.actions
+export const { courseFetchStart, courseFetchSuccess, courseFetchFailure, courseCreateSuccess, singleCourseSuccess} = courseSlice.actions
 export default courseSlice.reducer
