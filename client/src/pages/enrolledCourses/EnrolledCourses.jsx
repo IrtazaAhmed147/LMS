@@ -1,10 +1,24 @@
-import React from 'react';
-import { Box, Container, Typography, TextField, InputAdornment, MenuItem, Select, FormControl, InputLabel } from '@mui/material';
+import React, { useEffect, useRef } from 'react';
+import { Box, Container, Typography, TextField, InputAdornment, MenuItem, Select, FormControl, InputLabel, CircularProgress } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import CourseCard from '../../components/card/CourseCard';
+import { useDispatch, useSelector } from 'react-redux';
+import { getEnrolledCourses } from '../../redux/actions/courseActions';
+import { useParams } from 'react-router-dom';
 
 const EnrolledCourses = () => {
     const categories = ['All', 'Web Development', 'Data Science', 'AI/ML', 'Design', 'Marketing'];
+    const dispatch = useDispatch()
+    const { id } = useParams()
+
+    const token = localStorage.getItem('token')
+    const { enrolledCourses, isLoading, error } = useSelector((state) => state.course)
+    const searchValue = useRef('')
+    useEffect(() => {
+        dispatch(getEnrolledCourses(token, id))
+        console.log(enrolledCourses);
+
+    }, [])
 
     return (
         <Box
@@ -57,12 +71,11 @@ const EnrolledCourses = () => {
                 </Box>
 
                 {/* Courses Grid */}
-                <Box display="flex" flexWrap="wrap" gap={2}>
-                    {/* Example static data for now */}
-                    <CourseCard />
-                    <CourseCard />
-                    <CourseCard />
-                    <CourseCard />
+                <Box display="flex"  minHeight={'80vh'}  flexWrap="wrap" gap={2}>
+                    {isLoading ?<CircularProgress sx={{margin: 'auto'}} /> : enrolledCourses?.map((value) => (
+
+                        <CourseCard  {...value} key={value._id} />
+                    ))}
                 </Box>
             </Container>
         </Box>

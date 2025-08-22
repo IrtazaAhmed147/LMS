@@ -11,8 +11,15 @@ import {
 } from '@mui/material';
 import image from '../../assets/mern course.jpg';
 import { Link } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 
-const CourseCard = ({title, description, teacherId, thumbnail, _id, createdAt,category}) => {
+const CourseCard = ({title, description, teacherId, thumbnail, _id, createdAt,category, enrolledStudents}) => {
+
+  const {user} = useSelector((state)=> state.auth)
+  const isEnrolled = enrolledStudents?.find((student)=> {
+    return student === user._id
+  })
+  
 
    const isNew = (() => {
     if (!createdAt) return false;
@@ -26,6 +33,7 @@ const CourseCard = ({title, description, teacherId, thumbnail, _id, createdAt,ca
     <Card
       sx={{
         width: 270,
+        height: 360,
         borderRadius: 3,
         boxShadow: 4,
         transition: 'transform 0.3s, box-shadow 0.3s',
@@ -94,7 +102,7 @@ const CourseCard = ({title, description, teacherId, thumbnail, _id, createdAt,ca
       >
         <Typography variant="caption" fontWeight="bold">
       
-          Enroll Now
+          {isEnrolled ? "Continue" :"Enroll Now"}
         </Typography>
       </Box>
           </Link>

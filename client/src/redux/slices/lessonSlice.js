@@ -11,6 +11,7 @@ const lessonSlice = createSlice({
     initialState,
     reducers: {
         lessonFetchStart: (state) => {
+            state.lessons = []
             state.isLoading = true
             state.error = null
         },
@@ -31,6 +32,7 @@ const lessonSlice = createSlice({
         lessonFetchFailure: (state, action) => {
             state.isLoading = false;
             state.error = action.payload;
+            state.lessons = []
         },
         
     }

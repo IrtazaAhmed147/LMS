@@ -137,7 +137,7 @@ const CreateCourse = () => {
             label="Course Title"
             name="title"
             // value={courseData.current.title}
-            onChange={(e)=> courseData.current = {...courseData.current, [e.target.name]: e.target.value}}
+            onChange={(e) => courseData.current = { ...courseData.current, [e.target.name]: e.target.value }}
             placeholder="e.g., Advanced React for Beginners"
             fullWidth
             required
@@ -147,7 +147,7 @@ const CreateCourse = () => {
             label="Description"
             name="description"
             // value={courseData.current.description}
-            onChange={(e)=> courseData.current = {...courseData.current, [e.target.name]: e.target.value}}
+            onChange={(e) => courseData.current = { ...courseData.current, [e.target.name]: e.target.value }}
             placeholder="Describe your course..."
             multiline
             rows={5}
@@ -160,7 +160,7 @@ const CreateCourse = () => {
             <Select
               name="category"
               // value={courseData.current.category}
-              onChange={(e)=> courseData.current = {...courseData.current, [e.target.name]: e.target.value}}
+              onChange={(e) => courseData.current = { ...courseData.current, [e.target.name]: e.target.value }}
               label="Category"
             >
               {categories.map((cat, i) => (
@@ -175,11 +175,21 @@ const CreateCourse = () => {
             label="Estimated Duration"
             name="duration"
             // value={courseData.duration}
-            onChange={(e)=> courseData.current = {...courseData.current, [e.target.name]: e.target.value}}
+            onChange={(e) => courseData.current = { ...courseData.current, [e.target.name]: e.target.value }}
             placeholder="e.g., 4 hours"
             fullWidth
             required
           />
+          <Box display={'flex'} gap={2}>
+            <label style={{ display: 'flex', gap: 5 }}>
+
+              <input value={'Anyone can join'} defaultChecked type='radio' name='join' /> Anyone can join
+            </label>
+            <label style={{ display: 'flex', gap: 5 }}>
+
+              <input value={'Approval'} type='radio' name='join' /> Approval
+            </label>
+          </Box>
 
           <Box>
             <Button

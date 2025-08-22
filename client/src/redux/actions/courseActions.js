@@ -1,4 +1,4 @@
-import { courseCreateSuccess, courseFetchFailure, courseFetchStart, courseFetchSuccess, singleCourseSuccess } from "../slices/courseSlice"
+import { courseCreateSuccess, courseFetchFailure, courseFetchStart, courseFetchSuccess, enrolledCourseSuccess, singleCourseSuccess } from "../slices/courseSlice"
 import api from '../../utils/common.js'
 
 
@@ -90,3 +90,24 @@ export const updateCourse = (form, token, id) => async (dispatch) => {
         throw error.response.data.message
     }
 } 
+
+export const getEnrolledCourses = (token, id)=> async(dispatch)=> {
+    try {
+           dispatch(courseFetchStart())
+        const res = await api.get(`/course/enrolled/${id}`, {
+            headers: {
+                "Authorization": `Bearer ${token}`,
+            },
+            withCredentials: true
+        })
+        console.log(res.data.data);
+        
+        dispatch(enrolledCourseSuccess(res.data.data))
+        return res.data
+
+    } catch (error) {
+        console.log(error);
+        dispatch(courseFetchFailure(error.response.data.message))
+        throw error.response.data.message
+    }
+}

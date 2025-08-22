@@ -38,6 +38,19 @@ export const getTeacherCourses = async (req, res) => {
     }
 }
 
+export const getEnrolledCourses = async (req, res) => {
+    try {
+        console.log(req.user);
+        
+        const courses = await Course.find({ enrolledStudents: req.user.id }).populate("teacherId", "username email profilePic");
+        successHandler(res, 200, "course found successfully", courses)
+    }
+    catch (err) {
+        
+        errorHandler(res, 500, err.message)
+    }
+}
+
 export const createCourse = async (req, res) => {
     const { title, description, category } = req.body
     const file = req.file

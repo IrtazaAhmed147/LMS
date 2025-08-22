@@ -30,12 +30,10 @@ export const getCourseLessons = async (req, res) => {
         const isEnrolled = user.enrolledCourses.find((course) => {
             return course.courseId.toString() === req.params.id
         })
-        console.log(req.params.id);
+        
         
         const isCreator = user.createdCourses.includes(req.params.id);
         const isAdmin = req.user.role === "admin";
-        console.log(user.createdCourses);
-        console.log(isCreator);
         
         if (!isEnrolled && !isCreator && !isAdmin) {
             return res.status(403).json({ message: "Access denied" });
@@ -70,7 +68,6 @@ export const getSpecificLesson = async (req, res) => {
 
 export const createLesson = async (req, res) => {
     const { title, contentType, duration, courseId } = req.body
-    console.log(req.body);
     
     const files = req.files
     try {

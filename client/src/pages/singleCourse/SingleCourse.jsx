@@ -5,9 +5,6 @@ import {
   Button,
   Avatar,
   Divider,
-  Accordion,
-  AccordionSummary,
-  AccordionDetails,
   List,
   ListItem,
   ListItemText,
@@ -21,6 +18,8 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { getSpecificCourse } from '../../redux/actions/courseActions';
 import { getCourselesson } from '../../redux/actions/lessonActions';
+import api from '../../utils/common.js'
+import { notify } from '../../utils/HelperFunctions';
 
 
 
@@ -28,10 +27,11 @@ const SingleCourse = () => {
   const navigate = useNavigate();
   const { id } = useParams()
   console.log(id);
-  
+
   const dispatch = useDispatch()
   const { singleCourse } = useSelector((state) => state.course)
   const { lessons } = useSelector((state) => state.lesson)
+  const { user } = useSelector((state) => state.auth)
   const token = localStorage.getItem('token')
   useEffect(() => {
     dispatch(getSpecificCourse(id, token))
@@ -50,6 +50,28 @@ const SingleCourse = () => {
     setLessonDeleteModalOpen(true);
   };
 
+  const handleEnrollNow = async () => {
+    try {
+      const res = await api.get(`/enroll/${id}`, {
+        headers: {
+          "Authorization": `Bearer ${token}`,
+        },
+        withCredentials: true
+      })
+      console.log(res);
+      notify('success', res.data.message)
+    } catch (error) {
+      console.log(error);
+      notify('error', error.response.data.message)
+
+    }
+  }
+
+  const isEnrolled = singleCourse?.enrolledStudents?.find((student)=> {
+    return student === user._id
+  })
+  
+
   return (
     <Box
       sx={{
@@ -64,7 +86,7 @@ const SingleCourse = () => {
       <Box display="flex" gap={4} mb={4}>
         <Box>
           <img
-            src={singleCourse?.thumbnail || "/course-thumbnail.jpg"}
+            src={singleCourse?.thumbnail || "https://joyhub.bloominghomesociety.com/images/default-course-thumbnail.png"}
             alt="course thumbnail"
             style={{
               width: '300px',
@@ -90,7 +112,7 @@ const SingleCourse = () => {
       <Divider sx={{ my: 4 }} />
 
       {/* Teacher controls */}
-      <Box display="flex" gap={2} mb={4}>
+      {user?.createdCourses?.includes(singleCourse?._id) &&<Box display="flex" gap={2} mb={4}>
         <Link to={`/single/course/edit/${singleCourse?._id}`}>
           <Button variant="contained" color="primary">
             Edit Course
@@ -100,11 +122,11 @@ const SingleCourse = () => {
           Delete Course
         </Button>
         <Link to={`/lesson/create/${singleCourse?._id}`}>
-          <Button variant="contained" color="secondary">
+           <Button variant="contained" color="secondary">
             Add Lesson
           </Button>
         </Link>
-      </Box>
+      </Box>}
 
       {/* Course delete modal */}
       <Dialog open={deleteModalOpen} onClose={() => setDeleteModalOpen(false)}>
@@ -135,10 +157,10 @@ const SingleCourse = () => {
         Course Content
       </Typography>
       <List sx={{ mb: 4 }}>
-        {lessons?.length !== 0 && lessons?.map((lesson, index) => (
+        {!isEnrolled ? "Enroll to see lessons" : lessons.length === 0  ? "No lessons to show" : lessons?.map((lesson, index) => (
           <ListItem
             key={lesson._id}
-            secondaryAction={
+            secondaryAction={user.role === "teacher" &&
               <Box display="flex" gap={1}>
                 <Button
                   variant="outlined"
@@ -193,7 +215,7 @@ const SingleCourse = () => {
       </Box>
 
       {/* 5. Enroll CTA */}
-      <Paper
+      {!isEnrolled  && <Paper
         sx={{
           p: 3,
           display: 'flex',
@@ -207,10 +229,10 @@ const SingleCourse = () => {
         <Typography variant="h6" fontWeight="medium">
           Ready to start this course?
         </Typography>
-        <Button variant="contained" size="large" color="primary">
+        <Button variant="contained" size="large" color="primary" onClick={handleEnrollNow}>
           Enroll Now
         </Button>
-      </Paper>
+      </Paper>}
 
       {/* 6. Reviews */}
       <Typography variant="h5" fontWeight="bold" mb={2}>

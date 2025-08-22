@@ -10,6 +10,7 @@ import {
   MenuItem,
   FormControl,
   InputLabel,
+  CircularProgress,
 } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import CourseCard from '../../components/card/CourseCard';
@@ -99,10 +100,10 @@ function Course() {
         </Box>
 
         {/* Course Cards */}
-        <Box display="flex" gap={2} flexWrap="wrap">
-          {isLoading ? 'loading':course?.map((value)=> (
+        <Box display="flex"  minHeight={'80vh'} gap={2} flexWrap="wrap">
+          {isLoading ? <CircularProgress sx={{margin: 'auto'}} />:course?.map((value)=> (
 
-          <CourseCard {...value} key={value._id} />
+          <CourseCard  {...value} key={value._id} />
           ))}
           </Box>
       </Container>
