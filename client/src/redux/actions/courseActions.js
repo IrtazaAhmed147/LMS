@@ -106,8 +106,8 @@ export const getEnrolledCourses = (token, id)=> async(dispatch)=> {
         return res.data
 
     } catch (error) {
-        console.log(error);
-        dispatch(courseFetchFailure(error.response.data.message))
+        console.log(error.message);
+        dispatch(courseFetchFailure(error?.message))
         throw error.response.data.message
     }
 }

@@ -14,12 +14,12 @@ function Home() {
   const { user } = useSelector((state) => state.auth)
   const { enrolledCourses, isLoading, error } = useSelector((state) => state.course)
   const dispatch = useDispatch()
-  useEffect(() => {
-    if (user.role === 'student') {
+  // useEffect(() => {
+  //   if (user?.role === 'student') {
 
-      dispatch(getEnrolledCourses(token, user._id))
-    }
-  }, [])
+  //     dispatch(getEnrolledCourses(token, user._id))
+  //   }
+  // }, [])
 
   return (
     <>
@@ -37,19 +37,24 @@ function Home() {
           </Box>
 
           {/* Enrolled Courses */}
-          {user.role === 'student' && (<>
+          {user?.role === 'student' && (<>
             <Typography variant="h6" fontWeight="bold" mb={1}>
               Enrolled Courses
             </Typography>
             <Box display="flex" alignItems={'center'} gap={2} minHeight={340} flexWrap="wrap" mb={4}>
-              {isLoading ?  <CircularProgress sx={{margin: 'auto'}} />: enrolledCourses.slice(0,4)?.map((value) => (
+              {/* {isLoading ?  <CircularProgress sx={{margin: 'auto'}} /> :error ? <Typography>{error}</Typography>: enrolledCourses.slice(0,4)?.map((value) => (
 
                 <CourseCard  {...value} key={value._id} />
-              ))}
+              ))} */}
+              <CourseCard   />
+              <CourseCard   />
+              <CourseCard   />
+              <CourseCard   />
+              <CourseCard   />
             </Box>
           </>)}
 
-          {/* Recent Lessons */}
+          {/* Recent Lessons
           <Typography variant="h6" fontWeight="bold" mb={1}>
             Recent Lessons
           </Typography>
@@ -57,7 +62,7 @@ function Home() {
             <LessonCard />
             <LessonCard />
             <LessonCard />
-          </Box>
+          </Box> */}
 
          
         </Container>

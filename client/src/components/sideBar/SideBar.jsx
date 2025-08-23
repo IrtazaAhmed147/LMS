@@ -48,8 +48,8 @@ const SideBar = ({ drawerWidth, mobileOpen, handleDrawerToggle, isMobile }) => {
   ]
   if (!user) {
     otherInfo.push(
-      { url: '/login', name: 'login', icon: <LoginIcon /> },
-      { url: '/signup', name: 'signup', icon: <AppRegistrationIcon /> },
+      { url: '/auth', name: 'login', icon: <LoginIcon /> },
+      { url: '/auth', name: 'signup', icon: <AppRegistrationIcon /> },
     )
   }
 
@@ -58,7 +58,7 @@ const SideBar = ({ drawerWidth, mobileOpen, handleDrawerToggle, isMobile }) => {
       localStorage.removeItem('user')
       localStorage.removeItem('token')
       dispatch(userReset())
-      navigate('/login')
+      navigate('/auth')
       notify('success', 'User logged out successfully')
     } catch (error) {
       console.log(error);

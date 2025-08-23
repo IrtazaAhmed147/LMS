@@ -37,6 +37,8 @@ const courseSlice = createSlice({
         courseFetchFailure: (state, action) => {
             state.isLoading = false;
             state.error = action.payload;
+            console.log(state.error);
+            
         },
 
     }

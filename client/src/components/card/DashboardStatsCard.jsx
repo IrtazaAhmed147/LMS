@@ -13,16 +13,16 @@ const DashboardStatsCard = () => {
 
   const {stats} = useSelector((state)=> state.dashboard)
   const dispatch = useDispatch()
-  useEffect(()=> {
-    dispatch(getDashboardStats())
-  },[])
+  // useEffect(()=> {
+  //   dispatch(getDashboardStats())
+  // },[])
 
   return (
     <Box display="flex" flexWrap="wrap" gap={2}>
-      <StatCard icon={<SchoolIcon fontSize="large" />} count={stats?.totalCourses} label="Total Courses" />
-      <StatCard icon={<PeopleIcon fontSize="large" />} count={stats?.totalStudents} label="Students" />
-      <StatCard icon={<PersonIcon fontSize="large" />} count={stats?.totalInstructors} label="Instructors" />
-      <StatCard icon={<MenuBookIcon fontSize="large" />} count={stats?.totalLessons} label="Lessons" />
+      <StatCard icon={<SchoolIcon fontSize="large" />} count={stats?.totalCourses || '0'} label="Total Courses" />
+      <StatCard icon={<PeopleIcon fontSize="large" />} count={stats?.totalStudents || '0'} label="Students" />
+      <StatCard icon={<PersonIcon fontSize="large" />} count={stats?.totalInstructors || '0'} label="Instructors" />
+      <StatCard icon={<MenuBookIcon fontSize="large" />} count={stats?.totalLessons || '0'} label="Lessons" />
     </Box>
   );
 };
