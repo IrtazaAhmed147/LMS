@@ -2,6 +2,8 @@ import { createSlice } from "@reduxjs/toolkit"
 
 const initialState = {
     stats: {},
+    isDashboard: true,
+    isCourse: false,
     statLoading: false,
     statError: false,
 }
@@ -23,9 +25,13 @@ const dashboardSlice = createSlice({
             state.statLoading = false;
             state.statError = action.payload;
         },
+        toggleDashboardState: (state, action)=> {
+            state.isDashboard = action.payload
+            state.isCourse = !action.payload
+        }
       
     }
 })
 
-export const { statFetchStart, statFetchSuccess, statFetchFailure } = dashboardSlice.actions
+export const { statFetchStart, statFetchSuccess, statFetchFailure ,toggleDashboardState} = dashboardSlice.actions
 export default dashboardSlice.reducer

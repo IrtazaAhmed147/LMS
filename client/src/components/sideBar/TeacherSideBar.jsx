@@ -23,6 +23,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { notify } from '../../utils/HelperFunctions';
 import { userReset } from '../../redux/slices/authSlice';
+import { toggleDashboardState } from '../../redux/slices/dashboardSlice';
 
 const TeacherSideBar = ({ drawerWidth, mobileOpen, handleDrawerToggle, isMobile }) => {
   const { user } = useSelector((state) => state.auth)
@@ -30,8 +31,9 @@ const TeacherSideBar = ({ drawerWidth, mobileOpen, handleDrawerToggle, isMobile 
   const navigate = useNavigate()
   const location = useLocation();
   let list = [
-    { url: '/', name: 'Dashboard', icon: <DashboardIcon /> },
-    { url: '/course', name: 'Courses', icon: <MenuBookIcon /> },
+    { name: 'Dashboard', icon: <DashboardIcon /> },
+    { name: 'Courses', icon: <MenuBookIcon /> },
+    { name: 'Logout', icon: <LogoutIcon /> },
   ];
 
 
@@ -49,6 +51,17 @@ const TeacherSideBar = ({ drawerWidth, mobileOpen, handleDrawerToggle, isMobile 
     }
   }
 
+  const handleClick = async(name)=> {
+    if(name=== 'Logout') {
+      // handleLogout()
+    } else if ( name === 'Dashboard' ) {
+      dispatch(toggleDashboardState(true))
+    } else if(name === "Courses") {
+      dispatch(toggleDashboardState(false))
+      
+    }
+   }
+
   const drawerContent = (
     <Box sx={{ width: drawerWidth, p: 2, minHeight: 'calc(100vh - 64px)' }}>
       <Box>
@@ -56,42 +69,26 @@ const TeacherSideBar = ({ drawerWidth, mobileOpen, handleDrawerToggle, isMobile 
         <List sx={{ gap: 1, display: 'flex', flexDirection: 'column' }} >
           {list.map((item, i) => {
             return (
-              <Link to={item.url} key={i} style={{ textDecoration: 'none' }}>
-                <ListItem sx={{
-                  backgroundColor: '#f9f9f9', transition: '0.3s all ease-in-out', borderRadius: '10px', '&:hover': {
-                    bgcolor: '#e9e9e9ff',
-                  },
-                  padding: '0px',
-                  color: 'black'
-                }} >
-                  <ListItemButton>
-                    <ListItemIcon
-                      sx={{ color: 'text.secondary' }}
-                    >
-                      {item.icon}
-                    </ListItemIcon>
-                    <Typography sx={{ fontWeight: 'bold !important', fontSize: '17px' }}>{item.name}  </Typography>
-                  </ListItemButton>
-                </ListItem>
-              </Link>
+
+              <ListItem onClick={()=>handleClick(item.name)} key={i} sx={{
+                backgroundColor: '#f9f9f9', transition: '0.3s all ease-in-out', borderRadius: '10px', '&:hover': {
+                  bgcolor: '#e9e9e9ff',
+                },
+                padding: '0px',
+                color: 'black'
+              }} >
+                <ListItemButton>
+                  <ListItemIcon
+                    sx={{ color: 'text.secondary' }}
+                  >
+                    {item.icon}
+                  </ListItemIcon>
+                  <Typography sx={{ fontWeight: 'bold !important', fontSize: '17px' }}>{item.name}  </Typography>
+                </ListItemButton>
+              </ListItem>
+
             );
           })}
-          <ListItem sx={{
-            backgroundColor: '#f9f9f9', transition: '0.3s all ease-in-out', borderRadius: '10px', '&:hover': {
-              bgcolor: '#e9e9e9ff',
-            },
-            padding: '0px',
-            color: 'black'
-          }} >
-            <ListItemButton>
-              <ListItemIcon
-                sx={{ color: 'text.secondary' }}
-              >
-                <LogoutIcon/>
-              </ListItemIcon>
-              <Typography sx={{ fontWeight: 'bold !important', fontSize: '17px' }}>Logout</Typography>
-            </ListItemButton>
-          </ListItem>
         </List>
 
       </Box>
