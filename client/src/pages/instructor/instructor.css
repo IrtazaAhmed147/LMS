@@ -3,3 +3,13 @@ td{
     border-top: 1px solid #d5d5d5;
     
 }
+.create-course-btn:hover{
+    background-color: rgb(69 69 69);
+}
+.create-course-btn{
+    background-color: rgb(39, 39, 39);
+        color: white;
+    padding: 10px 20px;
+    width: auto;
+    transition: 0.5s all ease-in-out;
+}

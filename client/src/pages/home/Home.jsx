@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { Box, Typography, Container, CircularProgress } from '@mui/material';
+import { Box, Typography, Container, CircularProgress, Button } from '@mui/material';
 import Sidebar from '../../components/sideBar/SideBar';
 import CourseCard from '../../components/card/CourseCard';
 import DashboardStatsCard from '../../components/card/DashboardStatsCard';
@@ -7,6 +7,7 @@ import LessonCard from '../../components/card/LessonCard';
 import { useDispatch, useSelector } from 'react-redux';
 import { getDashboardStats } from '../../redux/actions/dashboardActions';
 import { getEnrolledCourses } from '../../redux/actions/courseActions';
+import banner from '../../assets/lms banner.png'
 
 function Home() {
 
@@ -20,52 +21,64 @@ function Home() {
   //     dispatch(getEnrolledCourses(token, user._id))
   //   }
   // }, [])
+  const categoriesArr = [
+    'Web Development',
+    'Backend Development',
+    'Data Science',
+    'Machine Learning',
+    'Artificial Intelligence',
+    'Cloud Computing',
+    'Cyber Security',
+    'Mobile Development',
+    'Game Development',
+    'Software Engineering',
+  ]
 
   return (
     <>
 
       {/* Main Content */}
-      <Box flex={1} bgcolor="#f5f5f5" minHeight="100vh" py={3} px={1}>
-        <Container sx={{ padding: '10px' }}>
+      <Box minHeight="100vh" py={3} >
 
-          {/* Dashboard Stats */}
-          <Typography variant="h5" fontWeight="bold" mb={2}>
-            Dashboard Overview
-          </Typography>
-          <Box display="flex" gap={2} flexWrap="wrap" mb={4}>
-            <DashboardStatsCard />
+        <Box width={'100%'} sx={{ display: { sm: 'flex', xs: 'block' } }} justifyContent={'space-between'} alignItems={'center'} bgcolor="#fff" >
+
+          <Box sx={{ width: { sm: '30%', xs: '98%' }, px: '10px' }}>
+            <Typography fontWeight={'bold'} variant='h4'>Learning that gets you</Typography>
+            <Typography color='#2e2e2eff'>Skills for your present and your future. Get Started with us</Typography>
+          </Box>
+          <Box sx={{ width: { sm: '65%', xs: '98%' }, p: '30px' }}>
+            <Box boxShadow={'0px 0px 5px 2px #ebebeb'} width={'100%'} component={'img'} src={banner} />
           </Box>
 
-          {/* Enrolled Courses */}
-          {user?.role === 'student' && (<>
-            <Typography variant="h6" fontWeight="bold" mb={1}>
-              Enrolled Courses
-            </Typography>
-            <Box display="flex" alignItems={'center'} gap={2} minHeight={340} flexWrap="wrap" mb={4}>
-              {/* {isLoading ?  <CircularProgress sx={{margin: 'auto'}} /> :error ? <Typography>{error}</Typography>: enrolledCourses.slice(0,4)?.map((value) => (
+        </Box>
 
-                <CourseCard  {...value} key={value._id} />
-              ))} */}
-              <CourseCard   />
-              <CourseCard   />
-              <CourseCard   />
-              <CourseCard   />
-              <CourseCard   />
-            </Box>
-          </>)}
+        <Box sx={{ padding: '20px' }} bgcolor={'#f1f1f1'}>
+          <Typography fontWeight={'bold'} mb={2} variant='h4'>Course Categories</Typography>
+          <Box width={'100%'} display={'flex'} flexWrap={'wrap'} gap={2} >
+            {categoriesArr.map((category, i) => (
+              <Button key={i} sx={{ borderRadius: 2, fontSize: '13px', fontWeight: 'bold', display: 'block', width: '310px', textAlign: 'start', border: '1px solid #ddd', color: 'black', transition: '0.6s all ease-in-out', backgroundColor: '#fff', '&:hover': { backgroundColor: '#cdcdcd' } }}>{category}</Button>
+            ))}
+          </Box>
+        </Box>
 
-          {/* Recent Lessons
-          <Typography variant="h6" fontWeight="bold" mb={1}>
-            Recent Lessons
-          </Typography>
-          <Box display="flex" gap={2} flexWrap="wrap" mb={4}>
-            <LessonCard />
-            <LessonCard />
-            <LessonCard />
-          </Box> */}
+        <Box sx={{ padding: '20px' }}>
+          <Typography fontWeight={'bold'}  mb={2} variant='h4'>Featured Courses</Typography>
+              <Box width={'100%'} display={'flex'} flexWrap={'wrap'} gap={2} >
 
-         
-        </Container>
+            <CourseCard />
+            <CourseCard />
+            <CourseCard />
+            <CourseCard />
+            <CourseCard />
+            <CourseCard />
+            <CourseCard />
+            <CourseCard />
+            <CourseCard />
+            <CourseCard />
+            <CourseCard />
+              </Box>
+        </Box>
+
       </Box>
     </>
   );
