@@ -3,6 +3,7 @@ import authSlice from './slices/authSlice'
 import courseSlice from './slices/courseSlice'
 import lessonSlice from './slices/lessonSlice'
 import dashboardSlice from './slices/dashboardSlice'
+import userSlice from './slices/userSlice'
 
 const store = configureStore({
     reducer: {
@@ -10,6 +11,7 @@ const store = configureStore({
         course: courseSlice,
         lesson: lessonSlice,
         dashboard: dashboardSlice,
+        user:userSlice,
     }
 })
 

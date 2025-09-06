@@ -13,6 +13,7 @@ import LessonForm from './pages/createLesson/LessonForm.jsx';
 import Auth from './pages/auth/Auth.jsx';
 import Instructor from './pages/instructor/Instructor.jsx';
 import Navbar from './components/navbar/Navbar.jsx';
+import ProtectedRoute from './components/protectedRoute/protectedRoute.jsx';
 
 function App() {
   return (
@@ -27,23 +28,28 @@ function App() {
         pauseOnHover
         theme="light"
       />
-  <Navbar />
       <Routes>
         {/* Public Routes */}
+
         <Route path="/auth" element={<Auth />} />
         <Route path="/otp" element={<Otp />} />
-        <Route path="/instructor" element={<Instructor />} />
+        <Route element={<ProtectedRoute allowedRoles={"teacher"} />}>
+          <Route path="/instructor" element={<Instructor />} />
           <Route path='/instructor/create-new-course' element={<CreateCourse />} />
+          <Route path='/instructor/create-new-lecture/:courseId' element={<LessonForm />} />
+        </Route>
 
-        {/* <Route element={<Layout />}> */}
-          <Route index element={<Home />} />
-          <Route path='/course' element={<Course />} />
-          <Route path='/course/:id' element={<SingleCourse />} />
-          <Route path='/course/enrolled/:id' element={<EnrolledCourses />} />
-          <Route path='/course/teacher/:id' element={<YourCourses />} />
-          <Route path='/lesson/create/:courseId' element={<LessonForm />} />
-          <Route path="/lesson/edit/:courseId/:lessonId" element={<LessonForm />} />
-        {/* </Route> */}
+        <Route element={<Layout />}>
+
+          <Route element={<ProtectedRoute allowedRoles={"student"} />}>
+            <Route path='/' element={<Home />} />
+            <Route path='/courses' element={<Course />} />
+            <Route path='/course/detail/:id' element={<SingleCourse />} />
+            <Route path='/course/enrolled/:id' element={<EnrolledCourses />} />
+          </Route>
+          {/* <Route path='/course/teacher/:id' element={<YourCourses />} /> */}
+          {/* <Route path="/lesson/edit/:courseId/:lessonId" element={<LessonForm />} /> */}
+        </Route>
 
 
 

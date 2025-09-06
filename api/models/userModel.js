@@ -25,13 +25,13 @@ const userSchema = new mongoose.Schema({
     },
     enrolledCourses: [
         {
-            courseId: { type: mongoose.Schema.Types.ObjectId, ref: "course" },
-            completedLessons: [{ type: mongoose.Schema.Types.ObjectId, ref: "lesson" }]
+            courseId: { type: mongoose.Schema.Types.ObjectId, ref: "Course" },
+            completedLessons: [{ type: mongoose.Schema.Types.ObjectId, ref: "lessons" }]
         }
     ],
     createdCourses: [{
         type: mongoose.Schema.Types.ObjectId,
-        ref: "course"
+        ref: "Course"
     }],
     profilePic: {
         type: String,

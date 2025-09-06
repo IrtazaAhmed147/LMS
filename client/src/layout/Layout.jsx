@@ -15,27 +15,16 @@ const Layout = () => {
   };
 
   return (
-    <Box sx={{ display: 'flex' }}>
+    
+    
+    
+    
+    <>
       <Navbar onMenuClick={handleDrawerToggle} />
-
-      <SideBar
-        drawerWidth={drawerWidth}
-        mobileOpen={mobileOpen}
-        handleDrawerToggle={handleDrawerToggle}
-        isMobile={isMobile}
-      />
-      <Box sx={{
-        width: isMobile ? '100%' : `calc(100% - ${drawerWidth}px)`,
-        marginTop:`64px`,
-      
-        minHeight: '100vh',
-        bgcolor: '#f5f5f5',
-      }}>
-
         <Outlet />
-      </Box>
+      </>
 
-    </Box>
+    
   );
 };
 

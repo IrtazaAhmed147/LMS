@@ -2,14 +2,14 @@ import api from '../../utils/common.js'
 import { loginFailure, loginStart, loginSuccess, signupStart, signupSuccess, signupFailure } from "../slices/authSlice"
 
 
-export const registerUser = (info, role) => async (dispatch) => {
+export const registerUser = (info) => async (dispatch) => {
 
-    const credentials = { ...info, role }
+    // const credentials = { ...info, role }
 
 
     try {
         dispatch(signupStart())
-        const res = await api.post('/auth/signup', credentials, {
+        const res = await api.post('/auth/signup', info, {
             withCredentials: true
         })
 

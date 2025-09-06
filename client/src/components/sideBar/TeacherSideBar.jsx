@@ -1,35 +1,24 @@
-import React from 'react';
 import {
   Drawer,
   Box,
   List,
   ListItem,
   ListItemIcon,
-  ListItemText,
-  Divider,
   ListItemButton,
   Typography
 } from '@mui/material';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import MenuBookIcon from '@mui/icons-material/MenuBook';
-import PlaylistAddCheckIcon from '@mui/icons-material/PlaylistAddCheck';
-import AddBoxIcon from '@mui/icons-material/AddBox';
-import PersonIcon from '@mui/icons-material/Person';
-import LoginIcon from '@mui/icons-material/Login';
-import AppRegistrationIcon from '@mui/icons-material/AppRegistration';
 import LogoutIcon from '@mui/icons-material/Logout';
-import LibraryBooksIcon from '@mui/icons-material/LibraryBooks';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import {  useLocation, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { notify } from '../../utils/HelperFunctions';
-import { userReset } from '../../redux/slices/authSlice';
+import { handleLogout } from '../../utils/HelperFunctions';
 import { toggleDashboardState } from '../../redux/slices/dashboardSlice';
 
 const TeacherSideBar = ({ drawerWidth, mobileOpen, handleDrawerToggle, isMobile }) => {
   const { user } = useSelector((state) => state.auth)
   const dispatch = useDispatch()
   const navigate = useNavigate()
-  const location = useLocation();
   let list = [
     { name: 'Dashboard', icon: <DashboardIcon /> },
     { name: 'Courses', icon: <MenuBookIcon /> },
@@ -37,23 +26,11 @@ const TeacherSideBar = ({ drawerWidth, mobileOpen, handleDrawerToggle, isMobile 
   ];
 
 
-  const handleLogout = async () => {
-    try {
-      localStorage.removeItem('user')
-      localStorage.removeItem('token')
-      dispatch(userReset())
-      navigate('/auth')
-      notify('success', 'User logged out successfully')
-    } catch (error) {
-      console.log(error);
-      notify('error', error.message)
 
-    }
-  }
 
   const handleClick = async(name)=> {
     if(name=== 'Logout') {
-      // handleLogout()
+      handleLogout(dispatch, navigate)
     } else if ( name === 'Dashboard' ) {
       dispatch(toggleDashboardState(true))
     } else if(name === "Courses") {

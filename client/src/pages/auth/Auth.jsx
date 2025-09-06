@@ -7,7 +7,7 @@ import './auth.css'
 import { useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { loginUser, registerUser } from '../../redux/actions/authActions';
-import { Box, Button, CircularProgress, Typography } from '@mui/material';
+import { Box, Button, CircularProgress, MenuItem, Select, Typography } from '@mui/material';
 import { notify } from '../../utils/HelperFunctions';
 import { useState } from 'react';
 function Auth() {
@@ -17,13 +17,21 @@ function Auth() {
     const navigate = useNavigate()
     const [showPass, setShowPass] = useState(false)
     const { isLoading, error, user } = useSelector((state) => state.auth)
-    const form = useRef({})
+    const form = useRef({
+        role:'student',
+        username:'',
+        email:'',
+        password:''
+    })
     console.log(isLogin);
 
 
     useEffect(() => {
-        if (user) {
-            navigate('/')
+        if (user?.role === 'student') {
+            navigate('/') 
+        } else if(user?.role === 'teacher') {
+            navigate('/instructor') 
+
         }
     }, [user])
 
@@ -39,8 +47,8 @@ function Auth() {
                 .catch((err) => notify('error', err))
 
         } else {
-            if (!form.current.username.trim() || !form.current.email.trim() || !form.current.password.trim() || !role) return;
-            dispatch(registerUser(form.current, role))
+            if (!form.current.username.trim() || !form.current.email.trim() || !form.current.password.trim() || !form.current.role) return notify('error','missing fields');
+            dispatch(registerUser(form.current))
                 .then((msg) => {
                     notify('success', msg)
                     setIsLogin(true)
@@ -80,18 +88,23 @@ function Auth() {
 
                             <label >
                                 <Typography fontWeight={'bold'}>Username</Typography>
-                                <input type="text" placeholder='Enter username' />
+                                <input  onChange={(e) => form.current.username = e.target.value} className='authInput' type="text" placeholder='Enter username' />
                             </label>
                             <label >
                                 <Typography fontWeight={'bold'}>User Email</Typography>
-                                <input type="email" placeholder='Enter your email' />
+                                <input  onChange={(e) => form.current.email = e.target.value} className='authInput' type="email" placeholder='Enter your email' />
                             </label>
                             <label >
                                 <Typography fontWeight={'bold'}>Password</Typography>
-                                <input type="password" placeholder='' />
+                                <input  onChange={(e) => form.current.password = e.target.value} className='authInput' type="password" placeholder='' />
                             </label>
+                                <Typography fontWeight={'bold'}>Role</Typography>
+                            <Select sx={{width:'100%'}} defaultValue={'student'} onChange={(e)=> form.current.role = e.target.value}>
+                                <MenuItem value='student'>Student</MenuItem>
+                                <MenuItem value='teacher'>Teacher</MenuItem>
+                            </Select>
 
-                            <button  >{isLoading && <CircularProgress  color="inherit" size="20px" />} Sign Up</button>
+                            <button  className='authBtn'>{isLoading && <CircularProgress  color="inherit" size="20px" />} Sign Up</button>
                         </form>
 
                     </Box>}
@@ -104,15 +117,15 @@ function Auth() {
                         <form onSubmit={handleForm}>
 
                             <label >
-                                <Typography fontWeight={'bold'}>UserName</Typography>
-                                <input onChange={(e) => form.current.username = e.target.value} type="text" required placeholder='Enter your username' />
+                                <Typography fontWeight={'bold'} >UserName</Typography>
+                                <input className='authInput' onChange={(e) => form.current.username = e.target.value} type="text" required placeholder='Enter your username' />
                             </label>
                             <label >
                                 <Typography fontWeight={'bold'}>Password</Typography>
-                                <input onChange={(e) => form.current.password = e.target.value} type="password" required placeholder='' />
+                                <input className='authInput' onChange={(e) => form.current.password = e.target.value} type="password" required placeholder='' />
                             </label>
 
-                            <button   >{isLoading && <CircularProgress  color="inherit" size="20px" />} Sign In</button>
+                            <button   className='authBtn'>{isLoading && <CircularProgress  color="inherit" size="20px" />} Sign In</button>
 
                         </form>
                     </Box>}

@@ -11,10 +11,20 @@ const courseSchema = new mongoose.Schema({
         required: true,
         lowercase: true,
     },
+    subTitle: {
+        type: String,
+        required: true,
+        lowercase: true,
+    },
+    language: {
+        type: String,
+        required: true,
+        lowercase: true,
+    },
     category: {
         type: String,
         required: true,
-        
+         lowercase: true,
     },
     thumbnail: {
         type: String
@@ -26,7 +36,7 @@ const courseSchema = new mongoose.Schema({
     },
     lessons: [{
         type: mongoose.Schema.Types.ObjectId,
-        ref: "Lesson"
+        ref: "lessons"
     }],
     enrolledStudents: [{
         type: mongoose.Schema.Types.ObjectId,

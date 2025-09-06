@@ -49,9 +49,6 @@ export const getSpecificlesson = (id, token) => async (dispatch) => {
     }
 }
 export const getCourselesson = (id, token) => async (dispatch) => {
-    console.log(id);
-    console.log(token);
-
 
     try {
         dispatch(lessonFetchStart())

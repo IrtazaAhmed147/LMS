@@ -8,19 +8,14 @@ import { useDispatch, useSelector } from 'react-redux';
 import { getDashboardStats } from '../../redux/actions/dashboardActions';
 import { getEnrolledCourses } from '../../redux/actions/courseActions';
 import banner from '../../assets/lms banner.png'
+import FeatureCard from '../../components/card/FeatureCard';
+import { useNavigate } from 'react-router-dom';
 
 function Home() {
 
-  const token = localStorage.getItem('token')
   const { user } = useSelector((state) => state.auth)
-  const { enrolledCourses, isLoading, error } = useSelector((state) => state.course)
-  const dispatch = useDispatch()
-  // useEffect(() => {
-  //   if (user?.role === 'student') {
+  const navigate = useNavigate()
 
-  //     dispatch(getEnrolledCourses(token, user._id))
-  //   }
-  // }, [])
   const categoriesArr = [
     'Web Development',
     'Backend Development',
@@ -65,17 +60,17 @@ function Home() {
           <Typography fontWeight={'bold'}  mb={2} variant='h4'>Featured Courses</Typography>
               <Box width={'100%'} display={'flex'} flexWrap={'wrap'} gap={2} >
 
-            <CourseCard />
-            <CourseCard />
-            <CourseCard />
-            <CourseCard />
-            <CourseCard />
-            <CourseCard />
-            <CourseCard />
-            <CourseCard />
-            <CourseCard />
-            <CourseCard />
-            <CourseCard />
+            <FeatureCard />
+            <FeatureCard />
+            <FeatureCard />
+            <FeatureCard />
+            <FeatureCard />
+            <FeatureCard />
+            <FeatureCard />
+            <FeatureCard />
+            <FeatureCard />
+            <FeatureCard />
+            <FeatureCard />
               </Box>
         </Box>
 

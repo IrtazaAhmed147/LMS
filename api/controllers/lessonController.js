@@ -30,11 +30,11 @@ export const getCourseLessons = async (req, res) => {
         const isEnrolled = user.enrolledCourses.find((course) => {
             return course.courseId.toString() === req.params.id
         })
-        
-        
+
+
         const isCreator = user.createdCourses.includes(req.params.id);
         const isAdmin = req.user.role === "admin";
-        
+
         if (!isEnrolled && !isCreator && !isAdmin) {
             return res.status(403).json({ message: "Access denied" });
         }
@@ -67,39 +67,58 @@ export const getSpecificLesson = async (req, res) => {
 }
 
 export const createLesson = async (req, res) => {
-    const { title, contentType, duration, courseId } = req.body
+   const { courseId } = req.body;
+  const titles = req.body.titles;  // array of titles
+  const files = req.files;         // multer → array of files
+
+  try {
+    // agar ek hi title ho to string milega, usko array banao
+    const titlesArray = Array.isArray(titles) ? titles : [titles];
+
+    let lessonData = [];
+
+    for (let i = 0; i < titlesArray.length; i++) {
+      const title = titlesArray[i];
+      const file = files[i];
+
+      let fileUrl = "";
+      if (file) {
+        const result = await uploadOnCloudinary(file, "lesson-content");
+        fileUrl = result.secure_url;
+      }
+
+      lessonData.push({
+        courseId,
+        title,
+        contentUrl: fileUrl,
+      });
+    }
+    console.log(lessonData);
     
-    const files = req.files
-    try {
-        if (!title || !contentType || !duration || !courseId) return errorHandler(res, 400, "missing fields")
 
-        let contentUrls = [];
+    // save all lessons
+    const insertedLessons = await Lesson.insertMany(lessonData);
 
-        if (files && files.length > 0) {
-            for (const file of files) {
-                const result = await uploadOnCloudinary(file, "lesson-content");
-                if (result?.secure_url) {
-                    contentUrls.push(result.secure_url);
-                }
-            }
-        }
-        const lessonData = new Lesson({
-            title,
-            contentType,
-            contentUrl: contentUrls,
-            duration,
-            courseId,
-        });
-        await lessonData.save()
-        await CourseModel.findByIdAndUpdate(courseId, {
-            $push: { lessons: lessonData._id }
-        })
-        successHandler(res, 201, "lesson created successfully", lessonData)
-    }
-    catch (err) {
-        errorHandler(res, 500, err.message)
-    }
-}
+    // get lesson IDs
+    const lessonIds = insertedLessons.map((l) => l._id);
+
+    // attach lessons to course
+    await CourseModel.findByIdAndUpdate(courseId, {
+      $push: { lessons: { $each: lessonIds } },
+    });
+
+    res.status(201).json({
+      success: true,
+      message: "Lessons created successfully",
+      data: insertedLessons,
+    });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+};
+
+
+
 export const deleteLesson = async (req, res) => {
     try {
         const lessonData = await Lesson.findByIdAndDelete(req.params.id);

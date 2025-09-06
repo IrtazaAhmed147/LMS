@@ -3,7 +3,10 @@ import { createSlice } from "@reduxjs/toolkit"
 const initialState = {
     course: [],
     enrolledCourses: [],
+    teacherCourses: [],
     singleCourse: {},
+    language: [],
+    categories: [],
     isLoading: false,
     error: false,
 }
@@ -29,6 +32,11 @@ const courseSlice = createSlice({
             state.error = null
             state.enrolledCourses = payload
         },
+        teacherCourseSuccess: (state, { payload }) => {
+            state.isLoading = false
+            state.error = null
+            state.teacherCourses = payload
+        },
         singleCourseSuccess: (state, { payload }) => {
             state.isLoading = false
             state.error = null
@@ -40,9 +48,15 @@ const courseSlice = createSlice({
             console.log(state.error);
             
         },
+        updateLanguage: (state, {payload})=> {
+            state.language = payload
+        },
+        updateCategories: (state, {payload})=> {
+            state.categories = payload
+        }
 
     }
 })
 
-export const { courseFetchStart, courseFetchSuccess, courseFetchFailure, courseCreateSuccess, singleCourseSuccess ,enrolledCourseSuccess} = courseSlice.actions
+export const { courseFetchStart, courseFetchSuccess, courseFetchFailure, courseCreateSuccess, singleCourseSuccess ,enrolledCourseSuccess,updateLanguage,updateCategories,teacherCourseSuccess} = courseSlice.actions
 export default courseSlice.reducer

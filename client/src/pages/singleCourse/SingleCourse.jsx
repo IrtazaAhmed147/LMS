@@ -2,17 +2,6 @@ import React, { useEffect, useState } from 'react';
 import {
   Box,
   Typography,
-  Button,
-  Avatar,
-  Divider,
-  List,
-  ListItem,
-  ListItemText,
-  Paper,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
 } from '@mui/material';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
@@ -20,8 +9,9 @@ import { getSpecificCourse } from '../../redux/actions/courseActions';
 import { getCourselesson } from '../../redux/actions/lessonActions';
 import api from '../../utils/common.js'
 import { notify } from '../../utils/HelperFunctions';
-
-
+import LanguageIcon from '@mui/icons-material/Language';
+import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
+import PlayCircleOutlinedIcon from '@mui/icons-material/PlayCircleOutlined';
 
 const SingleCourse = () => {
   const navigate = useNavigate();
@@ -32,10 +22,13 @@ const SingleCourse = () => {
   const { singleCourse } = useSelector((state) => state.course)
   const { lessons } = useSelector((state) => state.lesson)
   const { user } = useSelector((state) => state.auth)
+
   const token = localStorage.getItem('token')
   useEffect(() => {
     dispatch(getSpecificCourse(id, token))
-    dispatch(getCourselesson(id, token))
+    console.log(user);
+
+    // dispatch(getCourselesson(id, token))
 
   }, [])
   // Course delete modal
@@ -67,181 +60,72 @@ const SingleCourse = () => {
     }
   }
 
-  const isEnrolled = singleCourse?.enrolledStudents?.find((student)=> {
+  const isEnrolled = singleCourse?.enrolledStudents?.find((student) => {
     return student === user._id
   })
-  
+
+
 
   return (
-    <Box
-      sx={{
-        minHeight: '100vh',
-        width: '100%',
-        pt: 8,
-        px: 4,
-        bgcolor: '#f5f5f5',
-      }}
-    >
-      {/* 1. Header */}
-      <Box display="flex" gap={4} mb={4}>
-        <Box>
-          <img
-            src={singleCourse?.thumbnail || "https://joyhub.bloominghomesociety.com/images/default-course-thumbnail.png"}
-            alt="course thumbnail"
-            style={{
-              width: '300px',
-              height: '180px',
-              objectFit: 'cover',
-              borderRadius: '12px',
-            }}
-          />
+    <>
+
+      <Box  sx={{padding:{md:'20px',xs:'10px'}}}>
+        <Box sx={{ bgcolor: '#1a1b2b', borderTopLeftRadius: '10px', borderTopRightRadius: '10px', padding: '20px' }}>
+
+          <Typography mb={2} fontWeight={'bold'} fontSize={30} color='#fff'>{singleCourse?.title || 'Title'}</Typography>
+          <Typography mb={2} color='#fff' fontSize={18}>{singleCourse?.subTitle || 'subtitle'}</Typography>
+          <Box display={'flex'} alignItems={'center'} gap={2} >
+
+            <Typography color='#fff' fontSize={13}>Created By {singleCourse?.teacherId?.username}</Typography>
+            <Typography color='#fff' fontSize={13}>Created On {singleCourse?.createdAt?.split("T")[0]} </Typography>
+            <Typography color='#fff' fontSize={13} display={'flex'} alignItems={'center'}><LanguageIcon fontSize="small" />{singleCourse?.language}</Typography>
+            <Typography color='#fff' fontSize={13}>{singleCourse?.enrolledStudents?.length} {singleCourse?.enrolledStudents?.length > 1 ? 'Students' : 'Student'}</Typography>
+          </Box>
+
+
+
         </Box>
-        <Box>
-          <Typography variant="h4" fontWeight="bold">
-            {singleCourse?.title}
-          </Typography>
-          <Typography color="text.secondary" mb={2}>
-            Category: {singleCourse?.category || ''}
-          </Typography>
-          <Typography mt={2} fontWeight="bold">
-            Duration: 5 Hours
-          </Typography>
-        </Box>
-      </Box>
 
-      <Divider sx={{ my: 4 }} />
+        <Box display={'flex'} flexWrap={'wrap'} justifyContent={'space-between'} gap={1} >
+          <Box sx={{width:{md:'67%',sm:'55%'}}} marginTop={'20px'}>
 
-      {/* Teacher controls */}
-      {user?.createdCourses?.includes(singleCourse?._id) &&<Box display="flex" gap={2} mb={4}>
-        <Link to={`/single/course/edit/${singleCourse?._id}`}>
-          <Button variant="contained" color="primary">
-            Edit Course
-          </Button>
-        </Link>
-        <Button variant="outlined" color="error" onClick={() => setDeleteModalOpen(true)}>
-          Delete Course
-        </Button>
-        <Link to={`/lesson/create/${singleCourse?._id}`}>
-           <Button variant="contained" color="secondary">
-            Add Lesson
-          </Button>
-        </Link>
-      </Box>}
+            <Box sx={{ border: '1px solid #ddd', width: '100%', borderRadius: '8px', marginBottom: '20px', padding: '20px' }}>
+              <Typography fontSize={18} fontWeight={'bold'}>What you'll learn</Typography>
+              <Box display={'flex'} flexWrap={'wrap'} gap={2} marginTop={2} >
 
-      {/* Course delete modal */}
-      <Dialog open={deleteModalOpen} onClose={() => setDeleteModalOpen(false)}>
-        <DialogTitle>Confirm Delete</DialogTitle>
-        <DialogContent>
-          <Typography>
-            Are you sure you want to delete this course? This action cannot be undone.
-          </Typography>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setDeleteModalOpen(false)}>Cancel</Button>
-          <Button color="error" variant="contained">
-            Delete
-          </Button>
-        </DialogActions>
-      </Dialog>
+                <Typography fontSize={15} gap={1} display={'flex'} alignItems={'center'}><CheckCircleOutlineIcon fontSize="small" sx={{ color: "#00cda9" }} />  React Native Full Course 2024</Typography>
+                <Typography fontSize={15} gap={1} display={'flex'} alignItems={'center'}><CheckCircleOutlineIcon fontSize="small" sx={{ color: "#00cda9" }} />  React Native Full Course 2024</Typography>
+                <Typography fontSize={15} gap={1} display={'flex'} alignItems={'center'}><CheckCircleOutlineIcon fontSize="small" sx={{ color: "#00cda9" }} />  React Native Full Course 2024</Typography>
+                <Typography fontSize={15} gap={1} display={'flex'} alignItems={'center'}><CheckCircleOutlineIcon fontSize="small" sx={{ color: "#00cda9" }} />  React Native Full Course 2024</Typography>
 
-      {/* 2. About Course */}
-      <Typography variant="h5" fontWeight="bold" mb={2}>
-        About This Course
-      </Typography>
-      <Typography mb={4}>
-        {singleCourse?.description}
-      </Typography>
-
-      {/* 3. Lessons */}
-      <Typography variant="h5" fontWeight="bold" mb={2}>
-        Course Content
-      </Typography>
-      <List sx={{ mb: 4 }}>
-        {!isEnrolled ? "Enroll to see lessons" : lessons.length === 0  ? "No lessons to show" : lessons?.map((lesson, index) => (
-          <ListItem
-            key={lesson._id}
-            secondaryAction={user.role === "teacher" &&
-              <Box display="flex" gap={1}>
-                <Button
-                  variant="outlined"
-                  size="small"
-                  color="primary"
-                  onClick={() => navigate(`/lesson/edit/${index}`)}
-                >
-                  Edit
-                </Button>
-                <Button
-                  variant="outlined"
-                  size="small"
-                  color="error"
-                  onClick={() => handleLessonDelete(lesson._id)}
-                >
-                  Delete
-                </Button>
               </Box>
-            }
-          >
-            <ListItemText primary={`Lesson ${index + 1}: ${lesson.title}`} />
-          </ListItem>
-        ))}
-      </List>
+            </Box>
+            <Box marginBottom={2} sx={{ border: '1px solid #ddd', width: '100%', borderRadius: '8px', padding: '20px' }}>
+              <Typography fontSize={18} fontWeight={'bold'} marginBottom={2}>Course Description</Typography>
+              <Typography fontSize={15} display={'flex'} alignItems={'center'}>{singleCourse?.description}</Typography>
+            </Box>
+            <Box marginBottom={2} sx={{ border: '1px solid #ddd', width: '100%', borderRadius: '8px', padding: '20px' }}>
+              <Typography fontSize={18} fontWeight={'bold'} marginBottom={2}>Course Curriculum</Typography>
+              {singleCourse?.lessons?.map((lesson)=> (
 
-      {/* Lesson delete modal */}
-      <Dialog open={lessonDeleteModalOpen} onClose={() => setLessonDeleteModalOpen(false)}>
-        <DialogTitle>Confirm Lesson Delete</DialogTitle>
-        <DialogContent>
-          <Typography>
-            Are you sure you want to delete "{lessonToDelete}"? This action cannot be undone.
-          </Typography>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setLessonDeleteModalOpen(false)}>Cancel</Button>
-          <Button color="error" variant="contained">
-            Delete
-          </Button>
-        </DialogActions>
-      </Dialog>
+              <Typography key={lesson?._id} fontSize={15} display={'flex'} alignItems={'center'}><PlayCircleOutlinedIcon fontSize="small" />{lesson.title}</Typography>
+              ))}
 
-      {/* 4. Instructor */}
-      <Typography variant="h5" fontWeight="bold" mb={2}>
-        Instructor
-      </Typography>
-      <Box display="flex" alignItems="center" gap={2} mb={4}>
-        <Avatar src="/instructor.jpg" alt="instructor" sx={{ width: 56, height: 56 }} />
-        <Box>
-          <Typography fontWeight="bold">Sufiyan Ahmed</Typography>
-          <Typography color="text.secondary">Senior Web Developer</Typography>
+            </Box>
+
+          </Box>
+
+          <Box sx={{  marginTop: '20px', width: {md:'30%',sm:'42%'},    }}>
+          <Box sx={{ border: '1px solid #ddd', borderRadius: '8px',padding: {md:'20px',xs:'5px'},}}>
+
+
+            <Box component={'img'} src={singleCourse?.thumbnail} sx={{ width: '100%', maxHeight: '400px' }} />
+            <button style={{ width: '100%', padding: '10px', borderRadius: '10px', backgroundColor: '#1f1f1fdd', color: '#fff' }} onClick={handleEnrollNow}>{isEnrolled?'Continue':'Enroll Now'}</button>
+          </Box>
+          </Box>
         </Box>
       </Box>
-
-      {/* 5. Enroll CTA */}
-      {!isEnrolled  && <Paper
-        sx={{
-          p: 3,
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          bgcolor: '#e3f2fd',
-          borderRadius: 2,
-          mb: 6,
-        }}
-      >
-        <Typography variant="h6" fontWeight="medium">
-          Ready to start this course?
-        </Typography>
-        <Button variant="contained" size="large" color="primary" onClick={handleEnrollNow}>
-          Enroll Now
-        </Button>
-      </Paper>}
-
-      {/* 6. Reviews */}
-      <Typography variant="h5" fontWeight="bold" mb={2}>
-        Reviews
-      </Typography>
-      <Typography mb={2}>⭐️⭐️⭐️⭐️⭐️ 4.9 (120 reviews)</Typography>
-
-
-    </Box>
+    </>
   );
 };
 

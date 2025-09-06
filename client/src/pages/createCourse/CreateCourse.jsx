@@ -21,7 +21,7 @@ const CreateCourse = () => {
   const mode = 'create'
   // console.log(mode);
   const dispatch = useDispatch()
-  const { singleCourse } = useSelector((state) => state.course)
+  const { singleCourse, isLoading, error } = useSelector((state) => state.course)
   const token = localStorage.getItem('token')
   const [box, setBox] = useState('curriculum')
   const [lectureCount, setLectureCount] = useState(1)
@@ -45,17 +45,22 @@ const CreateCourse = () => {
     'Software Engineering',
   ]
 
-  const courseData = useRef({
+  const [courseData, setCourseData] = useState({
     title: singleCourse?.title || '',
     description: singleCourse?.description || '',
     category: singleCourse?.category || '',
-    duration: singleCourse?.duration || '',
-    thumbnail: null,
+    language: singleCourse?.language || '',
+    subTitle: singleCourse?.subTitle || '',
+
+    thumbnail: singleCourse?.thumbnail || null,
   });
-  console.log(courseData);
+
+  const [lectureData, setLectureData] = useState([
+    { title: 'lecture 1' }
+  ])
+
 
   const [thumbnailPreview, setThumbnailPreview] = useState(singleCourse?.thumbnail || null);
-  const categories = ['Web Development', 'Data Science', 'AI/ML', 'Design', 'Marketing'];
 
   useEffect(() => {
     // if (mode === 'edit' && singleCourse?.thumbnail) {
@@ -73,35 +78,62 @@ const CreateCourse = () => {
     const file = e.target.files[0];
     if (file) {
       // setCourseData({ ...courseData, thumbnail: file });
-      courseData.current = { ...courseData.current, thumbnail: file }
+      courseData.thumbnail = file
       setThumbnailPreview(URL.createObjectURL(file));
     }
   };
+  const handleLectureThumbnail = (e,i) => {
+    setLectureData((prev) =>
+      prev.map((item, index) =>
+        index === i ? { ...item, thumbnail: e.target.files[0] } : item
+      )
+    )
+    console.log(lectureData);
+    
+    // const file = e.target.files[0];
+    // if (file) {
+    //   // setCourseData({ ...courseData, thumbnail: file });
+    //   lectureData.thumbnail = file
+    //   setThumbnailPreview(URL.createObjectURL(file));
+    // }
+  };
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setCourseData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
 
   const handleSubmit = (e) => {
     e.preventDefault();
 
 
+    console.log(courseData);
+    console.log(lectureData);
+// return
     const formData = new FormData();
+    if (!courseData.title.trim() || !courseData.description.trim() || !courseData.category.trim() || !courseData.language.trim() || !courseData.thumbnail || !courseData.subTitle.trim()) return notify('error', 'missing fields')
 
-    // Append all fields from courseData.current
-    for (const key in courseData.current) {
-      formData.append(key, courseData.current[key]);
+    // // Append all fields from courseData.current
+    for (const key in courseData) {
+      formData.append(key, courseData[key]);
     }
+    // if (mode === 'create') {
 
-    if (mode === 'create') {
 
+    dispatch(createCourse(formData, token)).then((msg) => {
+      notify('success', msg)
+    }).catch((msg) => console.log(msg))
+    // } else if (mode === 'edit') {
+    //   console.log(mode);
+    //   dispatch(updateCourse(formData, token, singleCourse._id)).then((msg) => {
+    //     notify('success', msg)
+    //   })
 
-      dispatch(createCourse(formData, token)).then((msg) => {
-        notify('success', msg)
-      })
-    } else if (mode === 'edit') {
-      console.log(mode);
-      dispatch(updateCourse(formData, token, singleCourse._id)).then((msg) => {
-        notify('success', msg)
-      })
-
-    }
+    // }
 
     // Now you can send formData in an API call
     // axios.post('/api/course', formData, );
@@ -109,6 +141,11 @@ const CreateCourse = () => {
 
   const handleAddLecture = () => {
     setLectureCount(prev => prev + 1)
+    setLectureData((prev) => [
+      ...prev,
+      { title: `Lecture ${prev.length + 1}` }
+    ])
+
   }
 
   useEffect(() => {
@@ -134,8 +171,8 @@ const CreateCourse = () => {
 
       <Box sx={{ width: '98%', margin: 'auto', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <Typography fontWeight={'bold'} sx={{ fontSize: { sm: 30, xs: 20 } }} >Create a new course</Typography>
-        <button style={{
-          backgroundColor: 'rgb(45 45 45)', color: 'white', padding: '5px 10px', width: 'auto', margin: '0'
+        <button onClick={handleSubmit} style={{
+          backgroundColor: 'rgb(45 45 45)', borderRadius: '8px', border: 'none', color: 'white', padding: '10px 20px', width: 'auto', margin: '0'
         }}>Submit</button>
       </Box>
 
@@ -175,7 +212,7 @@ const CreateCourse = () => {
           <Typography mb={3} fontWeight={'bold'} fontSize={18}>Create Course Curriculum</Typography>
 
           <button onClick={handleAddLecture} style={{
-            backgroundColor: '#6b6b6bdd', color: 'white', padding: '10px 20px', width: 'auto'
+            backgroundColor: '#6b6b6bdd', borderRadius: '8px', border: 'none', color: 'white', padding: '10px 20px', width: 'auto'
           }}>Add Lecture</button>
           {Array.from({ length: lectureCount }).map((_, i) => (
             <Box
@@ -197,8 +234,17 @@ const CreateCourse = () => {
                   Lecture {i + 1}
                 </Typography>
                 <Box
+                  onChange={(e) =>
+                    setLectureData((prev) =>
+                      prev.map((item, index) =>
+                        index === i ? { ...item, title: e.target.value } : item
+                      )
+                    )
+                  }
+                  value={lectureData[i]?.title}
+                  name={`title${i + 1}`}
                   component={'input'}
-                  sx={{ width: { sm: '300px', xs: '100%' }, height: '30px' }}
+                  sx={{ width: { sm: '300px', xs: '100%' }, height: '30px', padding: '5px 10px', borderRadius: '8px', border: '1px solid #ddd' }}
                   type="text"
                   placeholder="Enter a lecture title"
                 />
@@ -208,6 +254,7 @@ const CreateCourse = () => {
                 component={'input'}
                 sx={{ width: { sm: '385px', xs: '100%' }, height: 'auto', padding: '0px' }}
                 type="file"
+                accept="image/*" onChange={(e)=> handleLectureThumbnail(e,i)}
               />
             </Box>
           ))}
@@ -221,10 +268,20 @@ const CreateCourse = () => {
           <form>
 
             <Typography fontWeight={'bold'} mt={2} fontSize={16}>Title</Typography>
-            <input style={{ height: '40px' }} type="text" placeholder='enter a course title' />
+            <input
+              name='title'
+              value={courseData.title}
+              onChange={handleChange}
+              style={{ height: '40px', width: '100%', padding: '5px 10px', borderRadius: '8px', border: '1px solid #ddd' }} type="text" placeholder='enter a course title' />
 
             <Typography fontWeight={'bold'} mt={2} fontSize={16}>Category</Typography>
-            <Select defaultValue="Category" style={{ width: '100%', height: '40px', outline: 'none', border: '1px solid #dddd', borderRadius: '8px' }}>
+            <Select
+              name='category'
+              onChange={handleChange}
+              value={courseData.category}
+              // defaultValue="Category" 
+              displayEmpty
+              style={{ width: '100%', height: '40px', outline: 'none', border: '1px solid #dddd', borderRadius: '8px' }}>
               <MenuItem value={'Category'} disabled={true}>{'Category'}</MenuItem >
               {categoriesArr?.map((category, i) => (
                 <MenuItem key={i} value={category} >{category}</MenuItem >
@@ -232,16 +289,28 @@ const CreateCourse = () => {
             </Select >
 
             <Typography fontWeight={'bold'} mt={2} fontSize={16}>Primary Language</Typography>
-            <Select defaultValue="Primary Language" style={{ width: '100%', height: '40px', outline: 'none', border: '1px solid #dddd', borderRadius: '8px' }}>
+            <Select
+              name='language'
+              value={courseData.language}
+              onChange={handleChange}
+              displayEmpty
+              // defaultValue="Primary Language" 
+              style={{ width: '100%', height: '40px', outline: 'none', border: '1px solid #dddd', borderRadius: '8px' }}>
               <MenuItem value="Primary Language" disabled={true}>Primary Language</MenuItem >
               <MenuItem value="English" >English</MenuItem >
               <MenuItem value="Urdu" >Urdu</MenuItem >
             </Select >
             <Typography fontWeight={'bold'} mt={2} fontSize={16}>Subtitle</Typography>
-            <input style={{ height: '40px' }} type="text" placeholder='enter a course subtitle' />
+            <input
+              value={courseData.subTitle}
+              onChange={handleChange}
+              name='subTitle' style={{ height: '40px', width: '100%', padding: '5px 10px', borderRadius: '8px', border: '1px solid #ddd' }} type="text" placeholder='enter a course subtitle' />
 
             <Typography fontWeight={'bold'} mt={2} fontSize={16}>Description</Typography>
-            <input style={{ height: '40px' }} type="text" placeholder='enter a course description' />
+            < input
+              value={courseData.description}
+              onChange={handleChange}
+              name='description' style={{ height: '40px', width: '100%', padding: '5px 10px', borderRadius: '8px', border: '1px solid #ddd' }} type="text" placeholder='enter a course description' />
 
           </form>
         </Box>}
@@ -250,118 +319,37 @@ const CreateCourse = () => {
 
           <Typography mb={3} fontWeight={'bold'} fontSize={18}>Course Settings</Typography>
 
+
+          {courseData.thumbnail && (
+            <Typography variant="caption" sx={{ mt: 1, display: 'block' }} color="text.secondary">
+              Selected: {courseData.thumbnail.name}
+            </Typography>
+          )}
+          {thumbnailPreview && (
+            <Box mt={2}>
+              <Typography variant="subtitle2" mb={1}>
+                Thumbnail Preview:
+              </Typography>
+              <Box
+                component="img"
+                src={thumbnailPreview}
+                alt="Thumbnail Preview"
+                sx={{
+                  maxWidth: '100%',
+                  objectFit: 'cover',
+                  borderRadius: 2,
+                  border: '1px solid #ddd'
+                }}
+              />
+            </Box>
+          )}
+
           <Typography fontWeight={'bold'} mt={2} fontSize={16}>Upload Course Image</Typography>
-          <input style={{ padding: '0px', height: 'auto', cursor: 'pointer' }} type="file" />
+          <input accept="image/*" onChange={handleThumbnailUpload} style={{ padding: '0px', height: 'auto', cursor: 'pointer' }} type="file" />
         </Box>}
 
-        {/* 
 
-        <Box component="form" onSubmit={handleSubmit} display="flex" flexDirection="column" gap={3}>
-          <TextField
-            label="Course Title"
-            name="title"
-            // value={courseData.current.title}
-            onChange={(e) => courseData.current = { ...courseData.current, [e.target.name]: e.target.value }}
-            placeholder="e.g., Advanced React for Beginners"
-            fullWidth
-            required
-          />
 
-          <TextField
-            label="Description"
-            name="description"
-            // value={courseData.current.description}
-            onChange={(e) => courseData.current = { ...courseData.current, [e.target.name]: e.target.value }}
-            placeholder="Describe your course..."
-            multiline
-            rows={5}
-            fullWidth
-            required
-          />
-
-          <FormControl fullWidth>
-            <InputLabel>Category</InputLabel>
-            <Select
-              name="category"
-              // value={courseData.current.category}
-              onChange={(e) => courseData.current = { ...courseData.current, [e.target.name]: e.target.value }}
-              label="Category"
-            >
-              {categories.map((cat, i) => (
-                <MenuItem key={i} value={cat}>
-                  {cat}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-
-          <TextField
-            label="Estimated Duration"
-            name="duration"
-            // value={courseData.duration}
-            onChange={(e) => courseData.current = { ...courseData.current, [e.target.name]: e.target.value }}
-            placeholder="e.g., 4 hours"
-            fullWidth
-            required
-          />
-          <Box display={'flex'} gap={2}>
-            <label style={{ display: 'flex', gap: 5 }}>
-
-              <input value={'Anyone can join'} defaultChecked type='radio' name='join' /> Anyone can join
-            </label>
-            <label style={{ display: 'flex', gap: 5 }}>
-
-              <input value={'Approval'} type='radio' name='join' /> Approval
-            </label>
-          </Box>
-
-          <Box>
-            <Button
-              variant="outlined"
-              component="label"
-              sx={{
-                borderStyle: 'dashed',
-                width: '100%',
-                py: 2,
-                textTransform: 'none',
-                fontWeight: 'medium',
-              }}
-            >
-              Upload Thumbnail
-              <input type="file" hidden accept="image/*" onChange={handleThumbnailUpload} />
-            </Button>
-            {courseData.thumbnail && (
-              <Typography variant="caption" sx={{ mt: 1, display: 'block' }} color="text.secondary">
-                Selected: {courseData.thumbnail.name}
-              </Typography>
-            )}
-            {thumbnailPreview && (
-              <Box mt={2}>
-                <Typography variant="subtitle2" mb={1}>
-                  Thumbnail Preview:
-                </Typography>
-                <Box
-                  component="img"
-                  src={thumbnailPreview}
-                  alt="Thumbnail Preview"
-                  sx={{
-                    maxWidth: '100%',
-                    height: 200,
-                    objectFit: 'cover',
-                    borderRadius: 2,
-                    border: '1px solid #ddd'
-                  }}
-                />
-              </Box>
-            )}
-          </Box>
-
-          <Box display="flex" justifyContent="flex-end" mt={2}>
-            <Button type="submit" variant="contained">
-              {mode === 'create' ? 'Create Course' : 'Update Course'}
-            </Button>
-          </Box>
-        </Box> */}
       </Box>
     </Box>
   );
