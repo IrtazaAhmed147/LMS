@@ -12,39 +12,27 @@ import { notify } from '../../utils/HelperFunctions';
 import LanguageIcon from '@mui/icons-material/Language';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import PlayCircleOutlinedIcon from '@mui/icons-material/PlayCircleOutlined';
+import EnrollModal from '../../components/modal/EnrollModal.jsx';
 
 const SingleCourse = () => {
   const navigate = useNavigate();
   const { id } = useParams()
-  console.log(id);
 
   const dispatch = useDispatch()
+  const [loading, setLoading] = useState(false)
   const { singleCourse } = useSelector((state) => state.course)
-  const { lessons } = useSelector((state) => state.lesson)
   const { user } = useSelector((state) => state.auth)
+  const [modal, setModal] = useState(false)
 
   const token = localStorage.getItem('token')
   useEffect(() => {
     dispatch(getSpecificCourse(id, token))
-    console.log(user);
-
-    // dispatch(getCourselesson(id, token))
 
   }, [])
-  // Course delete modal
-  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
-
-  // Lesson delete modal
-  const [lessonDeleteModalOpen, setLessonDeleteModalOpen] = useState(false);
-  const [lessonToDelete, setLessonToDelete] = useState(null);
-
-  const handleLessonDelete = (lesson) => {
-    setLessonToDelete(lesson);
-    setLessonDeleteModalOpen(true);
-  };
 
   const handleEnrollNow = async () => {
     try {
+      setLoading(true)
       const res = await api.get(`/enroll/${id}`, {
         headers: {
           "Authorization": `Bearer ${token}`,
@@ -52,9 +40,14 @@ const SingleCourse = () => {
         withCredentials: true
       })
       console.log(res);
+      setLoading(false)
       notify('success', res.data.message)
+      setModal(false)
+      navigate(`/lesson/detail/${singleCourse._id}`)
     } catch (error) {
+      setLoading(false)
       console.log(error);
+      
       notify('error', error.response.data.message)
 
     }
@@ -120,10 +113,18 @@ const SingleCourse = () => {
 
 
             <Box component={'img'} src={singleCourse?.thumbnail} sx={{ width: '100%', maxHeight: '400px' }} />
-            <button style={{ width: '100%', padding: '10px', borderRadius: '10px', backgroundColor: '#1f1f1fdd', color: '#fff' }} onClick={handleEnrollNow}>{isEnrolled?'Continue':'Enroll Now'}</button>
+            {isEnrolled && 
+            <Link to={`/lesson/detail/${singleCourse._id}`}>
+             <button style={{ width: '100%', padding: '10px', borderRadius: '10px', backgroundColor: '#1f1f1fdd', color: '#fff' }} >Continue</button>
+            </Link>
+             }
+            {!isEnrolled &&  <button style={{ width: '100%', padding: '10px', borderRadius: '10px', backgroundColor: '#1f1f1fdd', color: '#fff' }} onClick={()=> setModal(true)}>Enroll Now</button>}
+           
           </Box>
           </Box>
         </Box>
+
+        {modal && <EnrollModal setModal={setModal} loading={loading} handleEnroll={handleEnrollNow}  />}
       </Box>
     </>
   );

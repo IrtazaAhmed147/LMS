@@ -67,54 +67,53 @@ export const getSpecificLesson = async (req, res) => {
 }
 
 export const createLesson = async (req, res) => {
-   const { courseId } = req.body;
-  const titles = req.body.titles;  // array of titles
-  const files = req.files;         // multer → array of files
+    const { courseId } = req.body;
+    const titles = req.body.titles;  // array of titles
+    const files = req.files;         // multer → array of files
 
-  try {
-    // agar ek hi title ho to string milega, usko array banao
-    const titlesArray = Array.isArray(titles) ? titles : [titles];
+    try {
+        // agar ek hi title ho to string milega, usko array banao
+        const titlesArray = Array.isArray(titles) ? titles : [titles];
 
-    let lessonData = [];
+        let lessonData = [];
 
-    for (let i = 0; i < titlesArray.length; i++) {
-      const title = titlesArray[i];
-      const file = files[i];
+        for (let i = 0; i < titlesArray.length; i++) {
+            const title = titlesArray[i];
+            const file = files[i];
 
-      let fileUrl = "";
-      if (file) {
-        const result = await uploadOnCloudinary(file, "lesson-content");
-        fileUrl = result.secure_url;
-      }
+            let fileUrl = "";
+            if (file) {
+                const result = await uploadOnCloudinary(file, "lesson-content");
+                fileUrl = result.secure_url;
+            }
 
-      lessonData.push({
-        courseId,
-        title,
-        contentUrl: fileUrl,
-      });
+            lessonData.push({
+                courseId,
+                title,
+                contentUrl: fileUrl,
+            });
+        }
+
+
+        // save all lessons
+        const insertedLessons = await Lesson.insertMany(lessonData);
+
+        // get lesson IDs
+        const lessonIds = insertedLessons.map((l) => l._id);
+
+        // attach lessons to course
+        await CourseModel.findByIdAndUpdate(courseId, {
+            $push: { lessons: { $each: lessonIds } },
+        });
+
+        res.status(201).json({
+            success: true,
+            message: "Lessons created successfully",
+            data: insertedLessons,
+        });
+    } catch (err) {
+        res.status(500).json({ success: false, message: err.message });
     }
-    console.log(lessonData);
-    
-
-    // save all lessons
-    const insertedLessons = await Lesson.insertMany(lessonData);
-
-    // get lesson IDs
-    const lessonIds = insertedLessons.map((l) => l._id);
-
-    // attach lessons to course
-    await CourseModel.findByIdAndUpdate(courseId, {
-      $push: { lessons: { $each: lessonIds } },
-    });
-
-    res.status(201).json({
-      success: true,
-      message: "Lessons created successfully",
-      data: insertedLessons,
-    });
-  } catch (err) {
-    res.status(500).json({ success: false, message: err.message });
-  }
 };
 
 
@@ -133,17 +132,33 @@ export const deleteLesson = async (req, res) => {
 }
 
 export const updateLesson = async (req, res) => {
-
+    console.log(req.body);
+    console.log(req.params.id);
+    
     try {
-        const lessonData = await Lesson.findByIdAndUpdate(req.params.id, {
-            $set: req.body,
-        },
-            { new: true });
-        successHandler(res, 200, "lesson updated successfully", lessonData)
+        const file = req.file;
 
-    }
-    catch (err) {
-        errorHandler(res, 500, err.message)
+        const updateData = { ...req.body }; // copy body fields
+
+        if (file) {
+            const result = await uploadOnCloudinary(file, "lesson-content");
+            updateData.contentUrl = result.secure_url; // store new url
+        }
+
+        const lessonData = await Lesson.findByIdAndUpdate(
+            req.params.id,
+            { $set: updateData },
+            { new: true }
+        );
+
+        if (!lessonData) {
+            return errorHandler(res, 404, "Lesson not found");
+        }
+
+        successHandler(res, 200, "Lesson updated successfully", lessonData);
+    } catch (err) {
+        console.error(err);
+        errorHandler(res, 500, err.message);
     }
 }
 export const lessonComplete = async (req, res) => {

@@ -1,7 +1,7 @@
 import { lessonCreateSuccess, lessonFetchFailure, lessonFetchStart, lessonFetchSuccess, singlelessonSuccess } from "../slices/lessonSlice"
 import api from '../../utils/common.js'
 
-
+const token = localStorage.getItem('token')
 export const getAlllesson = (query) => async (dispatch) => {
     try {
         dispatch(lessonFetchStart())
@@ -23,7 +23,7 @@ export const getAlllesson = (query) => async (dispatch) => {
         throw error.response.data.message
     }
 }
-export const getSpecificlesson = (id, token) => async (dispatch) => {
+export const getSpecificlesson = (id) => async (dispatch) => {
     console.log(id);
 
     try {
@@ -48,7 +48,7 @@ export const getSpecificlesson = (id, token) => async (dispatch) => {
         throw error.response.data.message
     }
 }
-export const getCourselesson = (id, token) => async (dispatch) => {
+export const getCourselesson = (id) => async (dispatch) => {
 
     try {
         dispatch(lessonFetchStart())
@@ -72,7 +72,7 @@ export const getCourselesson = (id, token) => async (dispatch) => {
     }
 }
 
-export const createLesson = (form, token) => async (dispatch) => {
+export const createLesson = (form) => async (dispatch) => {
     console.log(form);
 
     try {
@@ -115,3 +115,26 @@ export const updatelesson = (form, token, id) => async (dispatch) => {
         throw error.response.data.message
     }
 } 
+
+export const deleteLesson = (token, id) => async (dispatch) => {
+    try {
+        dispatch(lessonFetchStart())
+        const res = await api.delete(`/lesson/delete/${id}`,  {
+            headers: {
+                "Authorization": `Bearer ${token}`,
+                'Content-Type': 'multipart/form-data'
+            },
+            withCredentials: true
+        })
+        console.log(res);
+        
+        dispatch(lessonCreateSuccess())
+        return res.data.message
+
+    } catch (error) {
+        console.log(error);
+
+        dispatch(lessonFetchFailure(error.response.data.message))
+        throw error.response.data.message
+    }
+}

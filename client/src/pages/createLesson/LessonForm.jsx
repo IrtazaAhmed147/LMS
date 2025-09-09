@@ -1,101 +1,149 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import {
-  Box, Typography, Button, TextField, Divider,
-  CircularProgress
+  Box, Typography, CircularProgress
 } from '@mui/material';
 import { useDispatch, useSelector } from 'react-redux';
-import { createLesson, getCourselesson } from '../../redux/actions/lessonActions';
+import { createLesson, deleteLesson, getCourselesson, updatelesson } from '../../redux/actions/lessonActions';
 import { notify } from '../../utils/HelperFunctions';
 import BackspaceOutlinedIcon from '@mui/icons-material/BackspaceOutlined';
 import BorderColorOutlinedIcon from '@mui/icons-material/BorderColorOutlined';
-
-
+import DeleteModal from '../../components/modal/DeleteModal';
+import CancelIcon from '@mui/icons-material/Cancel';
 
 const LessonForm = () => {
   const { courseId } = useParams();
   const dispatch = useDispatch();
   const token = localStorage.getItem('token');
-  const [lectureCount, setLectureCount] = useState(1)
-  const { lessons, isLoading, error } = useSelector((state) => state.lesson)
+  const { lessons, isLoading, error } = useSelector((state) => state.lesson);
 
-  const [box, setBox] = useState('create lecture')
-
-
-  const [lectureData, setLectureData] = useState([
-    { title: 'lecture 1' }
-  ])
+  const [lectureCount, setLectureCount] = useState(1);
+  const [box, setBox] = useState('create lecture');
+  const [mode, setMode] = useState('create');
+  const [lesson, setLesson] = useState({});
+  const [lectureData, setLectureData] = useState([{ title: 'Lecture 1' }]);
+  const [selectedLessonId, setSelectedLessonId] = useState(null);
+  const [modal, setModal] = useState(false);
+  const [againCall, setAgainCall] = useState(false);
+  const [lessonImage, setLessonImage] = useState(null);
 
   useEffect(() => {
-    // if (box === 'allLectures') {
+    if (box === 'allLectures') {
+      dispatch(getCourselesson(courseId, token));
+    }
+  }, [box, againCall, courseId, dispatch, token]);
 
-      dispatch(getCourselesson(courseId, token))
-      console.log(lessons);
+  useEffect(() => {
+    if (lesson?.contentUrl) {
+      setLessonImage(lesson.contentUrl);
+    }
+    if (lesson?.contentUrl?.name) {
+      setLessonImage(URL.createObjectURL(lesson.contentUrl))
+    }
+  }, [lesson]);
 
-    // }
-  }, [])
+  useEffect(() => {
+    return () => {
+      if (lessonImage) {
+        URL.revokeObjectURL(lessonImage);
+      }
+    };
+  }, [lessonImage]);
 
   const handleAddLecture = () => {
-    setLectureCount(prev => prev + 1)
+    if (lectureCount >= 3) {
+      notify('error', "You can only add up to 3 lectures at once.");
+      return;
+    }
+    setLectureCount(prev => prev + 1);
     setLectureData((prev) => [
       ...prev,
       { title: `Lecture ${prev.length + 1}` }
-    ])
+    ]);
+  };
 
-  }
+  const handleDecreaseLecture = (i) => {
+    setLectureCount(prev => prev - 1);
+    setLectureData((prev) => prev.filter((_, index) => index !== i));
+  };
+
   const handleLectureContent = (e, i) => {
     setLectureData((prev) =>
       prev.map((item, index) =>
         index === i ? { ...item, content: e.target.files[0] } : item
       )
-    )
+    );
+  };
+
+  const handleUpdateLectureContent = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setLesson({
+        ...lesson,
+        contentUrl: file,
+      });
+      setLessonImage(URL.createObjectURL(file));
+      console.log(file);
+
+    }
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    const missingField = lectureData.map((lecture) => {
-
-      if (!lecture?.title.trim() || !lecture?.content) {
-        return true
-
-      } else { return false }
-    })
-
-    if (missingField[0]) return notify('error', 'missingField')
     const formData = new FormData();
 
-    formData.append("courseId", courseId);
+    if (mode === 'create') {
+      const missingField = lectureData.some((lec) => !lec?.title?.trim() || !lec?.content);
+      if (missingField) return notify('error', 'All lectures must have a title and an image.');
 
-    lectureData.forEach((lesson, index) => {
-      formData.append(`titles[${index}]`, lesson.title);
-      formData.append("files", lesson.content);
-    });
+      formData.append("courseId", courseId);
+      lectureData.forEach((lec, index) => {
+        formData.append(`titles[${index}]`, lec.title);
+        formData.append("files", lec.content);
+      });
 
-    dispatch(createLesson(formData, token)).then((msg) =>
-      notify('success', msg)
-    ).catch((err) => notify('error', err))
+      dispatch(createLesson(formData, token))
+        .then((msg) => notify('success', msg))
+        .catch((err) => notify('error', err));
+    } else if (mode === 'edit') {
+      formData.append("title", lesson.title);
+      formData.append("file", lesson.contentUrl);
+
+      dispatch(updatelesson(formData, token, lesson?._id))
+        .then((msg) => {
+          setBox('allLectures');
+          notify('success', msg);
+        })
+        .catch((err) => notify('error', err));
+    }
   };
 
+  const handleDelete = (id) => {
+    dispatch(deleteLesson(token, id))
+      .then((msg) => {
+        setAgainCall(prev => !prev);
+        setModal(false);
+        notify('success', msg);
+      })
+      .catch((msg) => notify('error', msg));
+  };
 
   return (
-    <Box
-      sx={{
-        minHeight: '100vh',
-        // width: 'calc(100vw - 265px)',
-        px: 1,
-        py: 2,
-        bgcolor: '#f9f9f9',
-        overflowY: 'auto',
-      }}
-    >
-
+    <Box sx={{ minHeight: '100vh', px: { md: 1, xs: 0.5 }, py: 2, bgcolor: '#f9f9f9', overflowY: 'auto' }}>
       <Box sx={{ width: '98%', margin: 'auto', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <Typography fontWeight={'bold'} sx={{ fontSize: { sm: 30, xs: 20 } }} >Create new Lectures</Typography>
-        <button disabled={isLoading ? true : false} onClick={handleSubmit} style={{
-          backgroundColor: 'rgb(45 45 45)', display: 'flex', gap: '5px', borderRadius: '8px', border: 'none', color: 'white', padding: '10px 20px', width: 'auto', margin: '0'
-        }}>{isLoading && <CircularProgress size={15} color='white' />} Submit</button>
+        <Typography fontWeight={'bold'} sx={{ fontSize: { sm: 30, xs: 20 } }}>Lecture</Typography>
+        <button
+          disabled={isLoading}
+          onClick={handleSubmit}
+          style={{
+            backgroundColor: 'rgb(45 45 45)', display: 'flex', gap: '5px',
+            borderRadius: '8px', border: 'none', color: 'white',
+            padding: '10px 20px'
+          }}
+        >
+          {isLoading && <CircularProgress size={15} color='inherit' />} Submit
+        </button>
       </Box>
-
 
       <Box
         mt={3}
@@ -109,105 +157,180 @@ const LessonForm = () => {
           border: '1px solid #ddd'
         }}
       >
-
-        <Box sx={{ padding: '4px 4px', display: 'flex', alignItems: 'center', backgroundColor: '#f9f9f9', boxShadow: '1px 1px 9px 1px #c1c1c1', borderRadius: '8px', overflow: 'hidden', height: { sm: '30px', xs: '60px' }, width: { sm: '500px' }, marginBottom: '15px' }}>
-
-          <Box onClick={() => setBox('create lecture')} sx={{ cursor: 'pointer', borderRadius: '6px', height: '100%', backgroundColor: box === 'create lecture' ? 'white' : 'transparent', width: '50%', display: 'flex', justifyContent: 'center', alignItems: 'center', padding: { xs: '4px' } }}>
-            <Typography sx={{ fontSize: { sm: 15, xs: 13 } }} >create lecture</Typography>
+        {/* Tabs */}
+        <Box sx={{
+          padding: '4px 4px', display: 'flex', alignItems: 'center',
+          backgroundColor: '#f9f9f9', boxShadow: '1px 1px 9px 1px #c1c1c1',
+          borderRadius: '8px', overflow: 'hidden', height: { sm: '30px', xs: '60px' },
+          width: { sm: '500px' }, marginBottom: '15px'
+        }}>
+          <Box onClick={() => { setBox('create lecture'); setMode('create'); }}
+            sx={{ cursor: 'pointer', borderRadius: '6px', height: '100%', backgroundColor: box === 'create lecture' ? 'white' : 'transparent', width: '50%', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+            <Typography sx={{ fontSize: { sm: 15, xs: 12 } }}>Create Lecture</Typography>
           </Box>
-
-          <Box onClick={() => setBox('allLectures')} sx={{ cursor: 'pointer', borderRadius: '6px', height: '100%', backgroundColor: box === 'allLectures' ? 'white' : 'transparent', width: '50%', display: 'flex', justifyContent: 'center', alignItems: 'center', padding: { xs: '4px' } }}>
-            <Typography sx={{ fontSize: { sm: 15, xs: 13 } }} >All Lectures</Typography>
+          <Box onClick={() => setBox('allLectures')}
+            sx={{ cursor: 'pointer', borderRadius: '6px', height: '100%', backgroundColor: box === 'allLectures' ? 'white' : 'transparent', width: '50%', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+            <Typography sx={{ fontSize: { sm: 15, xs: 12 } }}>All Lectures</Typography>
           </Box>
-
-
+          <Box sx={{ cursor: 'not-allowed', borderRadius: '6px', height: '100%', backgroundColor: box === 'updateLecture' ? 'white' : 'transparent', width: '50%', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+            <Typography sx={{ fontSize: { sm: 15, xs: 12 } }}>Update Lecture</Typography>
+          </Box>
         </Box>
 
-
-
-        {box === 'create lecture' && <Box my={3} sx={{ padding: '10px 10px', backgroundColor: '#fff', boxShadow: '1px 1px 9px 1px #c1c1c1', borderRadius: '8px', width: '100%' }}>
-
-
-          <Typography mb={3} fontWeight={'bold'} fontSize={18}>Create Course Curriculum</Typography>
-
-          <button onClick={handleAddLecture} style={{
-            backgroundColor: '#6b6b6bdd', borderRadius: '8px', border: 'none', color: 'white', padding: '10px 20px', width: 'auto'
-          }}>Add Lecture</button>
-          {Array.from({ length: lectureCount }).map((_, i) => (
-            <Box
-              key={i}
-              my={3}
-              sx={{
-                padding: '10px 10px',
-                backgroundColor: '#fff',
-                border: '1px solid #dddd',
-                borderRadius: '8px',
-                width: '100%',
-              }}
-            >
-              <Box
-                mb={2}
-                sx={{ display: { sm: 'flex', xs: 'block' }, alignItems: 'center', gap: 2 }}
-              >
-                <Typography fontWeight={'bold'} fontSize={16}>
-                  Lecture {i + 1}
-                </Typography>
-                <Box
-                  onChange={(e) =>
-                    setLectureData((prev) =>
-                      prev.map((item, index) =>
-                        index === i ? { ...item, title: e.target.value } : item
-                      )
-                    )
-                  }
-                  value={lectureData[i]?.title}
-                  name={`title${i + 1}`}
-                  component={'input'}
-                  sx={{ width: { sm: '300px', xs: '100%' }, height: '30px', padding: '5px 10px', borderRadius: '8px', border: '1px solid #ddd' }}
-                  type="text"
-                  placeholder="Enter a lecture title"
-                />
-              </Box>
-
-              <Box
-                component={'input'}
-                sx={{ width: { sm: '385px', xs: '100%' }, height: 'auto', padding: '0px' }}
-                type="file"
-                accept="image/*" onChange={(e) => handleLectureContent(e, i)}
-              />
-            </Box>
-          ))}
-
-
-        </Box>}
-
-        {box === 'allLectures' &&
-          <Box >
-
-            {lessons?.map((lesson) => (
-
-              <Box sx={{ marginTop: '10px', width: '100%', padding: '10px', boxShadow: '0 4px 20px rgba(0,0,0,0.06)', display: 'flex', justifyContent: 'space-between' }}>
-                <Box>{lesson?.title}</Box>
-                <Box>
-                  <BorderColorOutlinedIcon />
-                  <span >
-                    <BackspaceOutlinedIcon />
+        {/* Create Lecture */}
+        {box === 'create lecture' && (
+          <Box my={3} sx={{ padding: '10px', backgroundColor: '#fff', boxShadow: '1px 1px 9px 1px #c1c1c1', borderRadius: '8px' }}>
+            <Typography mb={3} fontWeight={'bold'} fontSize={18}>Create Course Curriculum</Typography>
+            <button disabled={isLoading} className='common-btn' onClick={handleAddLecture} style={{ backgroundColor: '#6b6b6bdd' }}>
+              {isLoading && <CircularProgress size={20} color='inherit' />} Add Lecture
+            </button>
+            {Array.from({ length: lectureCount }).map((_, i) => (
+              <Box key={i} my={3} sx={{ padding: '10px', border: '1px solid #ddd', borderRadius: '8px' }}>
+                <Box mb={2} sx={{ width: '100%', position: 'relative', display: { sm: 'flex', xs: 'block' }, alignItems: 'center', gap: 2 }}>
+                  <Box mb={2} sx={{ display: { sm: 'flex', xs: 'block' }, alignItems: 'center', gap: 2 }}>
+                    <Typography fontWeight={'bold'} fontSize={16}>Lecture {i + 1}</Typography>
+                    <Box
+                      component={'input'}
+                      disabled={isLoading}
+                      type="text"
+                      value={lectureData[i]?.title}
+                      onChange={(e) =>
+                        setLectureData((prev) =>
+                          prev.map((item, index) =>
+                            index === i ? { ...item, title: e.target.value } : item
+                          )
+                        )
+                      }
+                      sx={{ outline: 'none', width: { sm: '300px', xs: '100%' }, height: '30px', padding: '5px 10px', borderRadius: '8px', border: '1px solid #ddd' }}
+                      placeholder="Enter a lecture title"
+                    />
+                  </Box>
+                  <span style={{ position: 'absolute', top: '0px', right: '0px' }} onClick={() => handleDecreaseLecture(i)}>
+                    <CancelIcon fontSize='medium' style={{ color: 'rgb(81 81 81)' }} />
                   </span>
+                </Box>
+                <Box>
+                  <input
+                    disabled={isLoading}
+                    type="file"
+                    id={`file-input-${i}`}
+                    accept="image/*"
+                    onChange={(e) => handleLectureContent(e, i)}
+                    style={{ display: "none" }}
+                  />
+                  <label htmlFor={`file-input-${i}`}>
+                    <Box component="span" className='fileSpan'>Upload File</Box>
+                  </label>
+                  {lectureData[i]?.content && (
+                    <span style={{ marginLeft: "10px" }}>
+                      {lectureData[i].content.name}
+                    </span>
+                  )}
                 </Box>
               </Box>
             ))}
-
-
           </Box>
+        )}
 
+        {/* All Lectures */}
+        {box === 'allLectures' && (
+          <Box>
+            {isLoading ? (
+              <Box sx={{
+                width: '100%',
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                minHeight: '40vh'
+              }}>
+                <CircularProgress color='inherit' />
+              </Box>
+            ) : error ? (
+              <p>{error}</p>
+            ) : (
+              lessons?.map((lessonn) => (
+                <Box key={lessonn?._id} sx={{ marginTop: '10px', padding: '10px', boxShadow: '0 4px 20px rgba(0,0,0,0.06)', display: 'flex', justifyContent: 'space-between' }}>
+                  <Box sx={{ fontSize: { md: 16, xs: 12 } }}>{lessonn?.title}</Box>
+                  <Box sx={{ display: 'flex', gap: 1 }}>
+                    <span onClick={() => {
+                      setMode('edit');
+                      setBox('updateLecture');
+                      setLesson(lessonn);
+                    }}>
+                      <BorderColorOutlinedIcon fontSize='small' />
+                    </span>
+                    <span onClick={() => {
+                      setModal(true);
+                      setSelectedLessonId(lessonn?._id);
+                    }}>
+                      <BackspaceOutlinedIcon fontSize='small' />
+                    </span>
+                  </Box>
+                </Box>
+              ))
+            )}
+          </Box>
+        )}
 
-        }
+        {/* Update Lecture */}
+        {box === 'updateLecture' && (
+          <Box my={3} sx={{ padding: '10px', backgroundColor: '#fff', boxShadow: '1px 1px 9px 1px #c1c1c1', borderRadius: '8px' }}>
+            <Typography mb={3} fontWeight={'bold'} fontSize={18}>Update Lecture</Typography>
+            <Box my={3} sx={{ padding: '10px', border: '1px solid #ddd', borderRadius: '8px' }}>
+              <Box mb={2} sx={{ display: { sm: 'flex', xs: 'block' }, alignItems: 'center', gap: 2 }}>
+                <Typography fontWeight={'bold'} fontSize={16}>Lecture</Typography>
+                <Box
+                  component={'input'}
+                  disabled={isLoading}
+                  type="text"
+                  value={lesson?.title || ""}
+                  onChange={(e) => setLesson({ ...lesson, title: e.target.value })}
+                  sx={{ width: { sm: '300px', xs: '100%' }, height: '30px', padding: '5px 10px', borderRadius: '8px', border: '1px solid #ddd' }}
+                  placeholder="Enter a lecture title"
+                />
+              </Box>
+              {lessonImage && (
+                <Box mt={2}>
+                  <Typography variant="subtitle2" mb={1}>Image Preview:</Typography>
+                  <Box
+                    component="img"
+                    src={lessonImage}
+                    alt="ImagePreview"
+                    sx={{ maxWidth: '100%', maxHeight: '400px', objectFit: 'cover', borderRadius: 2, border: '1px solid #ddd' }}
+                  />
+                </Box>
+              )}
+              <Box>
+                <input
+                  disabled={isLoading}
+                  type="file"
+                  id={`file-input-update`}
+                  accept="image/*"
+                  onChange={handleUpdateLectureContent}
+                  style={{ display: "none" }}
+                />
+                <label htmlFor={`file-input-update`}>
+                  <Box component="span" className='fileSpan'>Upload File</Box>
+                </label>
+                {lesson?.content && (
+                  <span style={{ marginLeft: "10px" }}>
+                    {lesson?.content?.name}
+                  </span>
+                )}
+              </Box>
+            </Box>
+          </Box>
+        )}
 
-
-
-
-
-
+        {/* Delete Modal */}
+        {modal && (
+          <DeleteModal
+            type={'lesson'}
+            setModal={setModal}
+            id={selectedLessonId}
+            handleDelete={handleDelete}
+          />
+        )}
       </Box>
     </Box>
   );

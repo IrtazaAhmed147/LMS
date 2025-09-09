@@ -1,0 +1,90 @@
+.common-btn {
+  gap: 5px;
+  background-color: #2d2d2d;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 20px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+  display: flex;
+  align-items: center;
+}
+.big-btn{
+  padding: 10px 20px;
+  font-size: 14px;
+    font-weight: bold;
+}
+
+td {
+  padding: 12px;
+  border-top: 1px solid #d5d5d5;
+
+}
+
+.common-btn:hover {
+  background-color: #444;
+  transform: scale(1.025);
+}
+
+.common-btn:disabled {
+  background-color: #aaa;
+  cursor: not-allowed;
+  transform: none;
+}
+.navBox{
+  display: flex;
+  align-items: center;
+  width: auto;
+  align-items: center;
+}
+
+.fileSpan {
+  display: inline-block;
+  padding: 8px 16px;
+  /* px:2, py:1 → padding */
+  background-color: #2d2d2d;
+  /* bgcolor */
+  color: #fff;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.fileSpan:hover {
+  background-color: #444;
+  /* &:hover */
+}
+
+
+input[type="checkbox"] {
+  accent-color: #2d2d2d;
+  /* modern browsers */
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+}
+
+@media only screen and (max-width: 600px) {
+  .common-btn {
+    padding: 5px 10px;
+    font-size: 10px;
+  }
+  
+  td {
+    padding: 3px;
+    font-size: 12px;
+  }
+  .big-btn{
+    padding:10px 15px;
+    font-size: 12px;
+  }
+}
+@media only screen and (max-width: 460px) {
+  .navBox{
+    justify-content: space-between;
+    width: 100%;
+  }
+}

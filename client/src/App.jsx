@@ -8,12 +8,13 @@ import Course from './pages/course/Course.jsx';
 import CreateCourse from './pages/createCourse/CreateCourse.jsx';
 import SingleCourse from './pages/singleCourse/SingleCourse.jsx';
 import EnrolledCourses from './pages/enrolledCourses/EnrolledCourses.jsx';
-import YourCourses from './pages/yourCourses/YourCourses.jsx';
 import LessonForm from './pages/createLesson/LessonForm.jsx';
 import Auth from './pages/auth/Auth.jsx';
 import Instructor from './pages/instructor/Instructor.jsx';
 import Navbar from './components/navbar/Navbar.jsx';
 import ProtectedRoute from './components/protectedRoute/protectedRoute.jsx';
+import LessonPage from './pages/lessonPage/LessonPage.jsx';
+import './App.css'
 
 function App() {
   return (
@@ -39,16 +40,15 @@ function App() {
           <Route path='/instructor/create-new-lecture/:courseId' element={<LessonForm />} />
         </Route>
 
-        <Route element={<Layout />}>
+        <Route element={<ProtectedRoute allowedRoles={"student"} />}>
+            <Route path='/lesson/detail/:id' element={<LessonPage />} />
+          <Route element={<Layout />}>
 
-          <Route element={<ProtectedRoute allowedRoles={"student"} />}>
             <Route path='/' element={<Home />} />
             <Route path='/courses' element={<Course />} />
             <Route path='/course/detail/:id' element={<SingleCourse />} />
             <Route path='/course/enrolled/:id' element={<EnrolledCourses />} />
           </Route>
-          {/* <Route path='/course/teacher/:id' element={<YourCourses />} /> */}
-          {/* <Route path="/lesson/edit/:courseId/:lessonId" element={<LessonForm />} /> */}
         </Route>
 
 

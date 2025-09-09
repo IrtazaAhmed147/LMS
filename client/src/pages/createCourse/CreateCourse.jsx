@@ -8,29 +8,30 @@ import {
   InputLabel,
   FormControl,
   Select,
-  Divider
+  Divider,
+  CircularProgress
 } from '@mui/material';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { createCourse, getSpecificCourse, updateCourse } from '../../redux/actions/courseActions';
 import { notify } from '../../utils/HelperFunctions';
 
 const CreateCourse = () => {
 
-  // const { mode, id } = useParams()
-  const mode = 'create'
-  // console.log(mode);
+  const [mode, setMode] = useState('create')
   const dispatch = useDispatch()
   const { singleCourse, isLoading, error } = useSelector((state) => state.course)
   const token = localStorage.getItem('token')
-  const [box, setBox] = useState('curriculum')
+  const [box, setBox] = useState('landing')
   const [lectureCount, setLectureCount] = useState(1)
-  // useEffect(() => {
+  const navigate = useNavigate()
+  useEffect(() => {
 
-  //   if (mode === 'edit' && id) {
-  //     dispatch(getSpecificCourse(id, token))
-  //   }
-  // }, [])
+    if (singleCourse?.title) {
+
+      setMode('edit')
+    }
+  }, [])
 
   const categoriesArr = [
     'Web Development',
@@ -62,17 +63,7 @@ const CreateCourse = () => {
 
   const [thumbnailPreview, setThumbnailPreview] = useState(singleCourse?.thumbnail || null);
 
-  useEffect(() => {
-    // if (mode === 'edit' && singleCourse?.thumbnail) {
-    //   setThumbnailPreview(singleCourse.thumbnail); // backend URL
-    // }
-  }, [mode, singleCourse]);
 
-  // const (e)=> courseData.current = {...courseData.current, [e.target.name]: e.target.value} = (e) => {
-  //   const { name, value } = e.target;
-  //   courseData.current = { ...courseData.current, [name]: value }
-
-  // };
 
   const handleThumbnailUpload = (e) => {
     const file = e.target.files[0];
@@ -81,21 +72,6 @@ const CreateCourse = () => {
       courseData.thumbnail = file
       setThumbnailPreview(URL.createObjectURL(file));
     }
-  };
-  const handleLectureThumbnail = (e,i) => {
-    setLectureData((prev) =>
-      prev.map((item, index) =>
-        index === i ? { ...item, thumbnail: e.target.files[0] } : item
-      )
-    )
-    console.log(lectureData);
-    
-    // const file = e.target.files[0];
-    // if (file) {
-    //   // setCourseData({ ...courseData, thumbnail: file });
-    //   lectureData.thumbnail = file
-    //   setThumbnailPreview(URL.createObjectURL(file));
-    // }
   };
 
   const handleChange = (e) => {
@@ -111,9 +87,6 @@ const CreateCourse = () => {
     e.preventDefault();
 
 
-    console.log(courseData);
-    console.log(lectureData);
-// return
     const formData = new FormData();
     if (!courseData.title.trim() || !courseData.description.trim() || !courseData.category.trim() || !courseData.language.trim() || !courseData.thumbnail || !courseData.subTitle.trim()) return notify('error', 'missing fields')
 
@@ -121,32 +94,28 @@ const CreateCourse = () => {
     for (const key in courseData) {
       formData.append(key, courseData[key]);
     }
-    // if (mode === 'create') {
+    if (mode === 'create') {
 
 
-    dispatch(createCourse(formData, token)).then((msg) => {
-      notify('success', msg)
-    }).catch((msg) => console.log(msg))
-    // } else if (mode === 'edit') {
-    //   console.log(mode);
-    //   dispatch(updateCourse(formData, token, singleCourse._id)).then((msg) => {
-    //     notify('success', msg)
-    //   })
+      dispatch(createCourse(formData, token)).then((msg) => {
+        notify('success', msg)
+        navigate('/instructor')
+      }).catch((msg) => console.log(msg))
+    } else if (mode === 'edit') {
+      console.log(mode);
+      console.log(singleCourse?._id);
+      console.log([...formData]);
 
-    // }
+      dispatch(updateCourse(formData, token, singleCourse._id)).then((msg) => {
+        notify('success', msg)
+        navigate('/instructor')
+      })
 
-    // Now you can send formData in an API call
-    // axios.post('/api/course', formData, );
+    }
+
   };
 
-  const handleAddLecture = () => {
-    setLectureCount(prev => prev + 1)
-    setLectureData((prev) => [
-      ...prev,
-      { title: `Lecture ${prev.length + 1}` }
-    ])
-
-  }
+  
 
   useEffect(() => {
     // Cleanup preview URL to avoid memory leaks
@@ -162,7 +131,7 @@ const CreateCourse = () => {
       sx={{
         minHeight: '100vh',
         // width: 'calc(100vw - 265px)',
-        px: 1,
+        px: {md:1,xs:0.5},
         py: 2,
         bgcolor: '#f9f9f9',
         overflowY: 'auto',
@@ -170,10 +139,18 @@ const CreateCourse = () => {
     >
 
       <Box sx={{ width: '98%', margin: 'auto', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <Typography fontWeight={'bold'} sx={{ fontSize: { sm: 30, xs: 20 } }} >Create a new course</Typography>
-        <button onClick={handleSubmit} style={{
-          backgroundColor: 'rgb(45 45 45)', borderRadius: '8px', border: 'none', color: 'white', padding: '10px 20px', width: 'auto', margin: '0'
-        }}>Submit</button>
+        <Typography fontWeight={'bold'} sx={{ fontSize: { sm: 30, xs: 15 } }} >{mode === 'edit' ? "Update Course" : 'Create a new course'}</Typography>
+        <button
+          disabled={isLoading}
+          onClick={handleSubmit}
+          style={{
+            backgroundColor: 'rgb(45 45 45)', display: 'flex', gap: '5px',
+            borderRadius: '8px', border: 'none', color: 'white',
+            padding: '10px 20px'
+          }}
+        >
+          {isLoading && <CircularProgress size={15} color='white' />} Submit
+        </button>
       </Box>
 
       <Box
@@ -191,80 +168,22 @@ const CreateCourse = () => {
 
         <Box sx={{ padding: '4px 4px', display: 'flex', alignItems: 'center', backgroundColor: '#f9f9f9', boxShadow: '1px 1px 9px 1px #c1c1c1', borderRadius: '8px', overflow: 'hidden', height: { sm: '30px', xs: '60px' }, width: { sm: '500px' }, marginBottom: '15px' }}>
 
-          <Box onClick={() => setBox('curriculum')} sx={{ cursor: 'pointer', borderRadius: '6px', height: '100%', backgroundColor: box === 'curriculum' ? 'white' : 'transparent', width: '50%', display: 'flex', justifyContent: 'center', alignItems: 'center', padding: { xs: '4px' } }}>
-            <Typography sx={{ fontSize: { sm: 15, xs: 13 } }} >Curriculum</Typography>
-          </Box>
 
           <Box onClick={() => setBox('landing')} sx={{ cursor: 'pointer', borderRadius: '6px', height: '100%', backgroundColor: box === 'landing' ? 'white' : 'transparent', width: '50%', display: 'flex', justifyContent: 'center', alignItems: 'center', padding: { xs: '4px' } }}>
-            <Typography sx={{ fontSize: { sm: 15, xs: 13 } }} >Course Landing Page</Typography>
+            <Typography sx={{ fontSize: { sm: 15, xs: 12 } }} >Course Landing Page</Typography>
           </Box>
 
           <Box onClick={() => setBox('settings')} sx={{ cursor: 'pointer', borderRadius: '6px', height: '100%', backgroundColor: box === 'settings' ? 'white' : 'transparent', width: '50%', display: 'flex', justifyContent: 'center', alignItems: 'center', padding: { xs: '4px' } }}>
-            <Typography sx={{ fontSize: { sm: 15, xs: 13 } }} >Settings</Typography>
+            <Typography sx={{ fontSize: { sm: 15, xs: 12 } }} >Settings</Typography>
           </Box>
 
         </Box>
 
 
-        {box === 'curriculum' && <Box my={3} sx={{ padding: '10px 10px', backgroundColor: '#fff', boxShadow: '1px 1px 9px 1px #c1c1c1', borderRadius: '8px', width: '100%' }}>
-
-
-          <Typography mb={3} fontWeight={'bold'} fontSize={18}>Create Course Curriculum</Typography>
-
-          <button onClick={handleAddLecture} style={{
-            backgroundColor: '#6b6b6bdd', borderRadius: '8px', border: 'none', color: 'white', padding: '10px 20px', width: 'auto'
-          }}>Add Lecture</button>
-          {Array.from({ length: lectureCount }).map((_, i) => (
-            <Box
-              key={i}
-              my={3}
-              sx={{
-                padding: '10px 10px',
-                backgroundColor: '#fff',
-                border: '1px solid #dddd',
-                borderRadius: '8px',
-                width: '100%',
-              }}
-            >
-              <Box
-                mb={2}
-                sx={{ display: { sm: 'flex', xs: 'block' }, alignItems: 'center', gap: 2 }}
-              >
-                <Typography fontWeight={'bold'} fontSize={16}>
-                  Lecture {i + 1}
-                </Typography>
-                <Box
-                  onChange={(e) =>
-                    setLectureData((prev) =>
-                      prev.map((item, index) =>
-                        index === i ? { ...item, title: e.target.value } : item
-                      )
-                    )
-                  }
-                  value={lectureData[i]?.title}
-                  name={`title${i + 1}`}
-                  component={'input'}
-                  sx={{ width: { sm: '300px', xs: '100%' }, height: '30px', padding: '5px 10px', borderRadius: '8px', border: '1px solid #ddd' }}
-                  type="text"
-                  placeholder="Enter a lecture title"
-                />
-              </Box>
-
-              <Box
-                component={'input'}
-                sx={{ width: { sm: '385px', xs: '100%' }, height: 'auto', padding: '0px' }}
-                type="file"
-                accept="image/*" onChange={(e)=> handleLectureThumbnail(e,i)}
-              />
-            </Box>
-          ))}
-
-
-        </Box>}
 
         {box === 'landing' && <Box my={3} sx={{ padding: '10px 10px', backgroundColor: '#fff', boxShadow: '1px 1px 9px 1px #c1c1c1', borderRadius: '8px', width: '100%' }}>
 
-          <Typography mb={3} fontWeight={'bold'} fontSize={18}>Create Landing Page</Typography>
+          <Typography mb={3} fontWeight={'bold'} fontSize={18}>{mode === 'edit' ? 'Update' : 'Create'} Landing Page</Typography>
           <form>
 
             <Typography fontWeight={'bold'} mt={2} fontSize={16}>Title</Typography>
@@ -279,12 +198,12 @@ const CreateCourse = () => {
               name='category'
               onChange={handleChange}
               value={courseData.category}
-              // defaultValue="Category" 
-              displayEmpty
+              defaultValue="Category"
+
               style={{ width: '100%', height: '40px', outline: 'none', border: '1px solid #dddd', borderRadius: '8px' }}>
               <MenuItem value={'Category'} disabled={true}>{'Category'}</MenuItem >
               {categoriesArr?.map((category, i) => (
-                <MenuItem key={i} value={category} >{category}</MenuItem >
+                <MenuItem key={i} value={category.toLowerCase()} >{category}</MenuItem >
               ))}
             </Select >
 
@@ -293,12 +212,12 @@ const CreateCourse = () => {
               name='language'
               value={courseData.language}
               onChange={handleChange}
-              displayEmpty
-              // defaultValue="Primary Language" 
+
+              defaultValue="Primary Language"
               style={{ width: '100%', height: '40px', outline: 'none', border: '1px solid #dddd', borderRadius: '8px' }}>
               <MenuItem value="Primary Language" disabled={true}>Primary Language</MenuItem >
-              <MenuItem value="English" >English</MenuItem >
-              <MenuItem value="Urdu" >Urdu</MenuItem >
+              <MenuItem value="english" >English</MenuItem >
+              <MenuItem value="urdu" >Urdu</MenuItem >
             </Select >
             <Typography fontWeight={'bold'} mt={2} fontSize={16}>Subtitle</Typography>
             <input

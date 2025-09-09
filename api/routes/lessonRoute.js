@@ -14,7 +14,7 @@ lessonRouter.get('/single/:id', verifyToken,getSpecificLesson)
 lessonRouter.post('/add', upload.array('files', 10),verifyTeacher,createLesson)
 lessonRouter.post('/:courseId/:lessonId/complete', verifyStudent,lessonComplete)
 lessonRouter.delete('/delete/:id', verifyTeacher,deleteLesson)
-lessonRouter.put('/update/:id', verifyTeacher,updateLesson)
+lessonRouter.put('/update/:id', verifyTeacher,upload.single('file'),updateLesson)
 
 
 

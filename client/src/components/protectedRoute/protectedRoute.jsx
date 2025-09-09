@@ -7,7 +7,9 @@ export default function ProtectedRoute({ children,allowedRoles  }) {
    const { user } = useSelector((state) => state.auth);
   const location = useLocation();
 
+  console.log(user);
   if (!user) {
+    console.log(user);
     
     // if not logged in → redirect to login
     return <Navigate to="/auth" state={{ from: location }} replace />;

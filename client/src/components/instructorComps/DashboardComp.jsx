@@ -4,13 +4,9 @@ import PeopleOutlineOutlinedIcon from '@mui/icons-material/PeopleOutlineOutlined
 import MenuBookOutlinedIcon from '@mui/icons-material/MenuBookOutlined';
 import { useSelector } from 'react-redux';
 
-function DashboardComp({ courses, totalStudents, createdCourse }) {
+function DashboardComp({ courses }) {
     const { users, isLoading, error } = useSelector((state) => state.user)
 
-    const enrolledStudents = createdCourse?.map((course) => {
-        users?.enrolledCourses.includes(course)
-    })
-    console.log(enrolledStudents);
 
 
     return (
@@ -18,15 +14,15 @@ function DashboardComp({ courses, totalStudents, createdCourse }) {
 
             <Box sx={{ display: 'flex', justifyContent: 'space-between' }} mt={3} mb={5}>
 
-                <Box sx={{ width: '49%', border: '1px solid #e3e3e3', borderRadius: '10px', backgroundColor: "#fff", padding: '20px', }}>
+                <Box sx={{ width: '49%', border: '1px solid #e3e3e3', borderRadius: '10px', backgroundColor: "#fff", padding: {md:'20px',xs:'10px'}, }}>
                     <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
                         <Typography fontWeight={'bold'} fontSize={16}>Total Students</Typography>
                         <Typography><PeopleOutlineOutlinedIcon /></Typography>
                     </Box>
-                    <Typography fontWeight={'bold'} fontSize={21}>{totalStudents}</Typography>
+                    <Typography fontWeight={'bold'} fontSize={21}>{users?.length || 0}</Typography>
                 </Box>
 
-                <Box sx={{ width: '49%', border: '1px solid #e3e3e3', borderRadius: '10px', backgroundColor: "#fff", padding: '20px', }}>
+                <Box sx={{ width: '49%', border: '1px solid #e3e3e3', borderRadius: '10px', backgroundColor: "#fff", padding: {md:'20px',xs:'10px'}, }}>
                     <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
                         <Typography fontWeight={'bold'} fontSize={16}>Total Courses</Typography>
                         <Typography><MenuBookOutlinedIcon /></Typography>
@@ -36,22 +32,33 @@ function DashboardComp({ courses, totalStudents, createdCourse }) {
 
             </Box>
 
-            <Box sx={{ padding: '20px', border: '1px solid #e3e3e3', borderRadius: '10px', backgroundColor: "#fff", }} >
+            <Box sx={{ padding: {md:'20px',xs:'5px'}, border: '1px solid #e3e3e3', borderRadius: '10px', backgroundColor: "#fff", }} >
                 <Typography fontWeight={'bold'} fontSize={18}>Students List</Typography>
-                {isLoading ? <Box sx={{ minHeight: '400px', display: 'flex', justifyContent: "center", alignItems: 'center' }}> <CircularProgress /> </Box> : error ? { error } :
-                    <table style={{ width: '100%' }}>
+                {isLoading ?
+                    <Box sx={{
+                        width: '100%',
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        minHeight: '30vh'
+                    }}>
 
-                        <thead style={{ color: '#999999' }}>
+                        <CircularProgress color='inherit' />
+                    </Box>
+                    : error ? { error } :
+                        <table style={{ width: '100%' }}>
 
-                            <tr>
-                                <td style={{ borderTop: 'none' }}>Course Name</td>
-                                <td style={{ borderTop: 'none' }}>Student Name</td>
-                                <td style={{ borderTop: 'none' }}>Student Email</td>
-                            </tr>
-                        </thead>
+                            <thead style={{ color: '#999999' }}>
 
-                        <tbody>
-                           
+                                <tr>
+                                    <td style={{ borderTop: 'none' }}>Course Name</td>
+                                    <td style={{ borderTop: 'none' }}>Student Name</td>
+                                    <td style={{ borderTop: 'none' }}>Student Email</td>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+
                                 {users?.map((user) => (
                                     <tr key={user?._id}>
                                         <td style={{ fontWeight: 'bold' }}>
@@ -66,9 +73,9 @@ function DashboardComp({ courses, totalStudents, createdCourse }) {
                                         <td>{user?.email}</td>
                                     </tr>
                                 ))}
-                            
-                        </tbody>
-                    </table>}
+
+                            </tbody>
+                        </table>}
             </Box>
 
         </>

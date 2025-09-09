@@ -1,77 +1,117 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import './course.css';
 import {
   Box,
   Typography,
-  Button,
   Select,
   MenuItem,
   CircularProgress,
+  useMediaQuery,
 } from '@mui/material';
-import SwapVertIcon from '@mui/icons-material/SwapVert';
 import { useDispatch, useSelector } from 'react-redux';
 import { getAllCourse } from '../../redux/actions/courseActions';
 import CourseSideBar from '../../components/sideBar/CoursesSideBar';
 import CourseCard from '../../components/card/CourseCard';
-import { useState } from 'react';
+import MenuIcon from '@mui/icons-material/Menu';
+
+
+const drawerWidth = 300;
 function Course() {
+  const dispatch = useDispatch();
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const isMobile = useMediaQuery('(max-width:900px)');
+  const { course, isLoading, error, language, categories } = useSelector(
+    (state) => state.course
+  );
+  console.log(error, '==>> error');
+  
+  const handleDrawerToggle = () => {
+    setMobileOpen(!mobileOpen);
+  };
 
-  const dispatch = useDispatch()
-  const { course, isLoading, error, language, categories } = useSelector((state) => state.course)
-  const searchValue = useRef('')
-  const [sortBy, setSortBy] = useState('Sort By')
+  const [sortBy, setSortBy] = useState('Sort By');
+  const searchValue = useRef('');
   useEffect(() => {
-    console.log(language);
-    if (categories.length !== 0 && language.length !== 0 && sortBy ) {
-
-      dispatch(getAllCourse({ categories, language,sortBy }))
-    } else if (categories.length !== 0) {
-      dispatch(getAllCourse({ categories }))
-    } else if (language.length !== 0) {
-      dispatch(getAllCourse({ language }))
-    } else if(sortBy) {
-      dispatch(getAllCourse({ sortBy }))
-
-    } else{
-
-      dispatch(getAllCourse())
-    }
-    console.log(course);
-
-  }, [language, categories, sortBy])
+    const query = {};
+    if (categories.length) {
+      query.category = categories
+    };
+    if (language.length) query.language = language;
+    if (sortBy && sortBy !== 'Sort By') query.sortBy = sortBy;
 
 
-  const handleSearch = async () => {
-    try {
-      // dispatch(getAllCourse({ title: searchValue.current }))
-      console.log(searchValue);
-    } catch (error) {
-      console.log(error);
+    dispatch(getAllCourse(query));
+  }, [categories, language, sortBy, dispatch]);
 
-    }
-
-  }
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    setSortBy(value);
-  }
+    setSortBy(e.target.value);
+  };
 
   return (
-    <Box minHeight="100vh" py={4} display={'flex'}>
-      <CourseSideBar drawerWidth={300} />
-      <Box width={'100%'} p={2}>
-        <Box display={'flex'} gap={1} justifyContent={'end'} alignItems={'center'}>
-          <Select name='sort' onChange={handleChange} value={sortBy} width={'auto'} sx={{ border: '1px solid #ddd', color: 'black' }} >
-            <MenuItem value={'Sort By'} disabled={true}>Sort By</MenuItem>
+    <Box display={'flex'}>
+      <CourseSideBar drawerWidth={drawerWidth}
+        mobileOpen={mobileOpen}
+        setMobileOpen={setMobileOpen}
+        handleDrawerToggle={handleDrawerToggle}
+        isMobile={isMobile} />
+      <Box sx={{width:'100%' , padding: { md: 2, sm: 1, xs: 0.5 } }}>
+        <Box
+          display={'flex'}
+          gap={1}
+          justifyContent={'end'}
+          alignItems={'center'}
+        >
+          <Box sx={{ display: { xs: 'flex', md: 'none' }, padding: '10px', borderRadius: '10px', cursor: 'pointer', border: '1px solid #ddd' }} onClick={handleDrawerToggle}>
+            <MenuIcon />
+            <Typography fontWeight={'bold'}>
+              Filters
+            </Typography>
+          </Box>
+          <Select
+            name="sort"
+            onChange={handleChange}
+            value={sortBy}
+            sx={{
+              height: '46px',
+              minWidth: { xs: "70px", sm: "100px", md: "120px" }, // responsive width
+              fontSize: { xs: "12px", sm: "14px", md: "16px" },    // responsive font size
+              border: "1px solid #ddd",
+              borderRadius: "8px",
+              backgroundColor: "#fff",
+              "& .MuiSelect-icon": {
+                fontSize: { xs: "16px", sm: "18px" }, // arrow size responsive
+              }
+            }}
+          >
+            <MenuItem value={'Sort By'} disabled>
+              Sort By
+            </MenuItem>
             <MenuItem value={'Newest'}>Newest</MenuItem>
           </Select>
-          <Typography fontWeight={'bold'}>{course?.length || `0`} results</Typography>
+          <Typography fontWeight={'bold'}>
+            {course?.length || `0`} results
+          </Typography>
         </Box>
 
-        {isLoading ? <CircularProgress /> : error ? { error } : course?.map((item) => (
-          <CourseCard {...item} key={item._id} />
-        ))}
 
+        {isLoading ? (
+          <Box sx={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            minHeight: '50vh'
+          }}>
+
+            <CircularProgress color='inherit' />
+          </Box>
+        ) : error ? (
+          <Typography color="error">{error}</Typography>
+        ) : (
+          <Box>
+
+            {course?.map((item) => <CourseCard {...item} key={item._id} />)}
+          </Box>
+        )}
       </Box>
     </Box>
   );

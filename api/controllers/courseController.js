@@ -8,10 +8,6 @@ export const getAllCourses = async (req, res) => {
     let language = req.query.language;
     let category = req.query.categories;
     const filter = {};
-    console.log(req.query.categories);
-
-
-    console.log(language, `==>> language`);
 
     if (language) {
         try {
@@ -69,19 +65,17 @@ export const getTeacherCourses = async (req, res) => {
 
 export const getEnrolledCourses = async (req, res) => {
     try {
-        console.log(req.user);
-
         const courses = await Course.find({ enrolledStudents: req.user.id }).populate("teacherId", "username email profilePic");
         successHandler(res, 200, "course found successfully", courses)
     }
     catch (err) {
-
+        
         errorHandler(res, 500, err.message)
     }
 }
 
 export const createCourse = async (req, res) => {
-    console.log(req.body);
+    
 
     const { title, description, category, language, subTitle } = req.body
     const file = req.file
@@ -137,8 +131,12 @@ export const deletecourse = async (req, res) => {
 
 export const updatecourse = async (req, res) => {
 
+    console.log(req.body, '=====> body');
+    
     try {
         const file = req.file
+        console.log(req.file);
+        
         if (file) {
             const url = await uploadOnCloudinary(file, 'course-images');
             req.body.thumbnail = url.secure_url
@@ -147,6 +145,8 @@ export const updatecourse = async (req, res) => {
             $set: req.body,
         },
             { new: true });
+            console.log(courseData);
+            
         successHandler(res, 200, "course updated successfully", courseData)
 
     }

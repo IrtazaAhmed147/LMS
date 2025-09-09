@@ -12,13 +12,8 @@ import {
 import PlayCircleOutlineIcon from '@mui/icons-material/PlayCircleOutline';
 import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
 
-const LessonCard = () => {
-  const lesson = {
-    title: 'Excel Basics',
-    contentType: 'video',
-    contentUrl: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
-    duration: '15 mins',
-  };
+const LessonCard = ({contentUrl,title}) => {
+
 
   const getIcon = () => {
     switch (lesson.contentType.toLowerCase()) {
@@ -34,7 +29,12 @@ const LessonCard = () => {
   return (
     <Card
       sx={{
-        width: 320,
+        display:'flex',
+        gap:1,
+        height:100,
+        backgroundColor:'#161722ff',
+        padding:'10px',
+        width: '100%',
         borderRadius: 3,
         boxShadow: 5,
         overflow: 'hidden',
@@ -46,48 +46,20 @@ const LessonCard = () => {
         position: 'relative',
       }}
     >
-      {/* Top colored border */}
-      <Box
-        sx={{
-          height: 6,
-          background:
-            lesson.contentType === 'video'
-              ? 'linear-gradient(to right, #2196f3, #21cbf3)'
-              : 'linear-gradient(to right, #ff6f00, #ff8f00)',
-        }}
-      />
+    
 
-      <CardContent sx={{ backgroundColor: '#f8f9fa' }}>
-        <Box display="flex" alignItems="center" justifyContent="space-between" mb={2}>
-          <Chip
-            label={lesson.contentType.toUpperCase()}
-            color={lesson.contentType === 'video' ? 'primary' : 'warning'}
-            size="small"
-            icon={getIcon()}
-          />
-          <Typography variant="caption" color="text.secondary">
-            ⏱ {lesson.duration}
-          </Typography>
+    
+        <Box sx={{width:'120px' , height:'100%'}}>
+            <Box borderRadius={2} width={'100%'} height={'100%'} component={'img'} src={contentUrl || 'https://www.contentviewspro.com/wp-content/uploads/2017/07/default_image.png'}/>
         </Box>
 
-        <Typography variant="subtitle1" fontWeight="bold">
-          {lesson.title}
+        <Typography variant="subtitle1" color='white' fontWeight="bold">
+          {title}
         </Typography>
-      </CardContent>
+    
 
-      <Divider />
-
-      <CardActions sx={{ px: 2, py: 1.5, backgroundColor: '#ffffff' }}>
-        <Button
-          variant="contained"
-          fullWidth
-          color={lesson.contentType === 'video' ? 'primary' : 'warning'}
-          href={lesson.contentUrl}
-          target="_blank"
-        >
-          {lesson.contentType === 'video' ? 'Watch Lesson' : 'Open File'}
-        </Button>
-      </CardActions>
+      
+      
     </Card>
   );
 };

@@ -12,8 +12,9 @@ export const getAllCourse = (query) => async (dispatch) => {
                 title: query?.title,
                 // language: JSON.stringify(query?.language),
                 language: JSON.stringify(query?.language),
-                categories: JSON.stringify(query?.categories),
-                sortBy: query?.sortBy
+                categories: JSON.stringify(query?.category),
+                sortBy: query?.sortBy,
+                limit:query?.limit
             }
             ,
             withCredentials: true
@@ -23,10 +24,10 @@ export const getAllCourse = (query) => async (dispatch) => {
         dispatch(courseFetchSuccess(res?.data.data))
         return res.data.message
     } catch (error) {
-        console.log(error);
+        dispatch(courseFetchFailure(error.message))
+        
 
-        dispatch(courseFetchFailure(error.response.data.message))
-        throw error.response.data.message
+        throw error.message
     }
 }
 export const getSpecificCourse = (id, token) => async (dispatch) => {
@@ -48,9 +49,9 @@ export const getSpecificCourse = (id, token) => async (dispatch) => {
         dispatch(singleCourseSuccess(res?.data.data))
         return res.data.message
     } catch (error) {
+        dispatch(courseFetchFailure(error.response.data.message))
         console.log(error);
 
-        dispatch(courseFetchFailure(error.response.data.message))
         throw error.response.data.message
     }
 }
@@ -73,9 +74,9 @@ export const getTeacherCourses = (id, token) => async (dispatch) => {
         dispatch(teacherCourseSuccess(res?.data.data))
         return res.data.message
     } catch (error) {
+        dispatch(courseFetchFailure(error.response.data.message))
         console.log(error);
 
-        dispatch(courseFetchFailure(error.response.data.message))
         throw error.response.data.message
     }
 }
@@ -94,15 +95,13 @@ export const createCourse = (form, token) => async (dispatch) => {
         return res.data.message
 
     } catch (error) {
-        console.log(error);
-
         dispatch(courseFetchFailure(error.response.data.message))
         throw error.response.data.message
     }
 }
-
 export const updateCourse = (form, token, id) => async (dispatch) => {
-    try {
+    console.log([...form]);
+    try { 
         dispatch(courseFetchStart())
         const res = await api.put(`/course/update/${id}`, form, {
             headers: {
@@ -115,9 +114,9 @@ export const updateCourse = (form, token, id) => async (dispatch) => {
         return res.data.message
 
     } catch (error) {
+        dispatch(courseFetchFailure(error.response.data.message))
         console.log(error);
 
-        dispatch(courseFetchFailure(error.response.data.message))
         throw error.response.data.message
     }
 }
@@ -137,17 +136,20 @@ export const deleteCourse = (token, id) => async (dispatch) => {
         return res.data.message
 
     } catch (error) {
-        console.log(error);
-
         dispatch(courseFetchFailure(error.response.data.message))
+        
+
         throw error.response.data.message
     }
 }
 
-export const getEnrolledCourses = (token, id) => async (dispatch) => {
+export const getEnrolledCourses = (token) => async (dispatch) => {
     try {
+        console.log(token);
+        
+
         dispatch(courseFetchStart())
-        const res = await api.get(`/course/enrolled/${id}`, {
+        const res = await api.get(`/course/enrolled`, {
             headers: {
                 "Authorization": `Bearer ${token}`,
             },
@@ -159,7 +161,6 @@ export const getEnrolledCourses = (token, id) => async (dispatch) => {
         return res.data
 
     } catch (error) {
-        console.log(error.message);
         dispatch(courseFetchFailure(error?.message))
         throw error.response.data.message
     }

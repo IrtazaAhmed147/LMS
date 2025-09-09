@@ -15,7 +15,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { handleLogout } from '../../utils/HelperFunctions';
 import { toggleDashboardState } from '../../redux/slices/dashboardSlice';
 
-const TeacherSideBar = ({ drawerWidth, mobileOpen, handleDrawerToggle, isMobile }) => {
+const TeacherSideBar = ({ drawerWidth, mobileOpen,setMobileOpen, handleDrawerToggle, isMobile }) => {
   const { user } = useSelector((state) => state.auth)
   const dispatch = useDispatch()
   const navigate = useNavigate()
@@ -40,14 +40,16 @@ const TeacherSideBar = ({ drawerWidth, mobileOpen, handleDrawerToggle, isMobile 
    }
 
   const drawerContent = (
-    <Box sx={{ width: drawerWidth, p: 2, minHeight: 'calc(100vh - 64px)' }}>
+    <Box sx={{ width: drawerWidth, p: 2, minHeight: 'calc(100vh - 64px)' }}> 
       <Box>
         <Typography fontWeight={'bold'} fontSize={24}>Instructor View</Typography>
         <List sx={{ gap: 1, display: 'flex', flexDirection: 'column' }} >
           {list.map((item, i) => {
             return (
 
-              <ListItem onClick={()=>handleClick(item.name)} key={i} sx={{
+              <ListItem onClick={()=>{
+                setMobileOpen(false)
+                handleClick(item.name)}} key={i} sx={{
                 backgroundColor: '#f9f9f9', transition: '0.3s all ease-in-out', borderRadius: '10px', '&:hover': {
                   bgcolor: '#e9e9e9ff',
                 },
@@ -78,6 +80,10 @@ const TeacherSideBar = ({ drawerWidth, mobileOpen, handleDrawerToggle, isMobile 
       {/* Mobile Drawer */}
       {isMobile && (
         <Drawer
+        
+        disableAutoFocus
+          anchor="left"
+          disableEnforceFocus
           variant="temporary"
           open={mobileOpen}
           onClose={handleDrawerToggle}
@@ -97,6 +103,8 @@ const TeacherSideBar = ({ drawerWidth, mobileOpen, handleDrawerToggle, isMobile 
       {/* Desktop Drawer */}
       {!isMobile && (
         <Drawer
+          anchor="left"
+          disableEnforceFocus
           variant="permanent"
           sx={{
             width: drawerWidth,

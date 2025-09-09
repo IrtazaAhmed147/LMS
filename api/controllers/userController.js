@@ -5,22 +5,15 @@ import { errorHandler, successHandler } from "../utils/responseHandler.js";
 
 export const getAllUsers = async (req, res) => {
       let { username, email, isAdmin, createdCourses } = req.query;
-    console.log(createdCourses);
-    
+   
   if (createdCourses) {
-    console.log('chala1');
+   
     try {
-      console.log('chala2');
+
       createdCourses = JSON.parse(createdCourses); // e.g. ["123","456"]
-      // Convert to ObjectId if your DB stores course IDs as ObjectId
-      // console.log('chala2 ==>>>');
       createdCourses = createdCourses.map((id) => new mongoose.Types.ObjectId(id));
-      console.log('chala3');
-      
-      console.log(createdCourses);
-      
     } catch (err) {
-      console.log('chala error =>>>', err);
+      console.log('error =>>>', err);
       createdCourses = [];
     }
   }

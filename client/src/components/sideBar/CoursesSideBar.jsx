@@ -10,11 +10,19 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { useState } from 'react';
 import { updateCategories, updateLanguage } from '../../redux/slices/courseSlice';
+import CancelIcon from '@mui/icons-material/Cancel';
 
-const CourseSideBar = ({ drawerWidth, mobileOpen, handleDrawerToggle, isMobile }) => {
+const CourseSideBar = ({ drawerWidth, mobileOpen,setMobileOpen, handleDrawerToggle, isMobile }) => {
   const dispatch = useDispatch()
   const [lang, setLang] = useState([])
-  const [categories, setCategories] = useState([])
+  const { categories } = useSelector(
+    (state) => state.course
+  );
+  console.log(categories);
+
+  const [categoriesState, setCategoriesState] = useState(categories)
+
+  console.log(categoriesState);
 
 
   const categoriesArr = [
@@ -42,7 +50,6 @@ const CourseSideBar = ({ drawerWidth, mobileOpen, handleDrawerToggle, isMobile }
       } else {
         updated = prev.filter((item) => item !== value);
       }
-
       dispatch(updateLanguage(updated)); // ab hamesha latest value milegi
       console.log(updated);
 
@@ -53,7 +60,7 @@ const CourseSideBar = ({ drawerWidth, mobileOpen, handleDrawerToggle, isMobile }
   const handleCatFilter = (e) => {
     const { value, checked } = e.target;
 
-    setCategories((prev) => {
+    setCategoriesState((prev) => {
       let updated;
       if (checked) {
         updated = [...prev, value];
@@ -64,7 +71,7 @@ const CourseSideBar = ({ drawerWidth, mobileOpen, handleDrawerToggle, isMobile }
       dispatch(updateCategories(updated));
       console.log(updated);
 
-      return updated; 
+      return updated;
     });
 
   };
@@ -73,19 +80,25 @@ const CourseSideBar = ({ drawerWidth, mobileOpen, handleDrawerToggle, isMobile }
 
 
   const drawerContent = (
-    <Box id='drawer' sx={{ width: drawerWidth, p: 2, position: 'relative', minHeight: 'calc(100vh - 64px)' }}>
+    <Box id='drawer' sx={{ width: drawerWidth, p: 2, minHeight: 'calc(100vh - 64px)' }}>
       <Box>
+        <Box sx={{display:{md:'none',xs:'flex'}, width:'100%', justifyContent:'space-between',alignContent:'center'}}>
+
         <Typography fontWeight={'bold'} fontSize={24}>All Courses</Typography>
+        <span onClick={()=> setMobileOpen(false)} style={{marginRight:'30px',alignContent:'center'}}>
+          <CancelIcon />
+        </span>
+        </Box>
 
 
         <Typography fontWeight={'bold'} fontSize={14}>CATERGORY</Typography>
         <List>
           {categoriesArr.map((category, i) => (
             <ListItem key={i} sx={{ padding: 0 }}>
-              <label >
+              <label style={{ display: 'flex', gap: '5px' }}>
 
                 <input type="checkbox" onChange={handleCatFilter}
-                  checked={categories.includes(category.toLowerCase())} value={category.toLowerCase()} /> {category}
+                  checked={categories.includes(category)} value={category} /> {category}
               </label>
             </ListItem>
           ))}
@@ -93,10 +106,21 @@ const CourseSideBar = ({ drawerWidth, mobileOpen, handleDrawerToggle, isMobile }
         <Divider />
         <Typography fontWeight={'bold'} fontSize={14}>PRIMARY LANGUAGE</Typography>
         <List>
-          <ListItem sx={{ padding: 0 }}><input type="checkbox" onChange={handleLanguageFilter}
-            checked={lang.includes("english")} value={`english`} />English</ListItem>
-          <ListItem sx={{ padding: 0 }}><input type="checkbox" onChange={handleLanguageFilter}
-            checked={lang.includes("urdu")} value={`urdu`} />Urdu</ListItem>
+
+          <ListItem sx={{ padding: 0 }}>
+            <label style={{ display: 'flex', gap: '5px' }}>
+              <input type="checkbox" onChange={handleLanguageFilter}
+                checked={lang.includes("english")} value={`english`} />English
+            </label>
+          </ListItem>
+          <ListItem sx={{ padding: 0 }}>
+            <label style={{ display: 'flex', gap: '5px' }}>
+
+              <input type="checkbox" onChange={handleLanguageFilter}
+                checked={lang.includes("urdu")} value={`urdu`} />Urdu
+            </label>
+
+          </ListItem>
 
         </List>
 
@@ -110,6 +134,9 @@ const CourseSideBar = ({ drawerWidth, mobileOpen, handleDrawerToggle, isMobile }
       {/* Mobile Drawer */}
       {isMobile && (
         <Drawer
+        disableAutoFocus
+          anchor="left"
+          disableEnforceFocus
           variant="temporary"
           open={mobileOpen}
           onClose={handleDrawerToggle}
@@ -120,7 +147,7 @@ const CourseSideBar = ({ drawerWidth, mobileOpen, handleDrawerToggle, isMobile }
             '& .MuiDrawer-paper': {
               width: drawerWidth,
               overflow: 'hidden',
-              position: 'relative',
+              // position: 'relative',
             },
           }}
         >
@@ -131,7 +158,9 @@ const CourseSideBar = ({ drawerWidth, mobileOpen, handleDrawerToggle, isMobile }
       {/* Desktop Drawer */}
       {!isMobile && (
         <Drawer
-
+        
+          anchor="left"
+          disableEnforceFocus
           variant="permanent"
           sx={{
             position: 'relative',
