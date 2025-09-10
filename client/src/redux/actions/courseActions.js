@@ -1,6 +1,7 @@
 import { courseCreateSuccess, courseFetchFailure, courseFetchStart, courseFetchSuccess, enrolledCourseSuccess, singleCourseSuccess, teacherCourseSuccess } from "../slices/courseSlice"
 import api from '../../utils/common.js'
 
+const user = localStorage.getItem('user') || ''
 
 export const getAllCourse = (query) => async (dispatch) => {
 
@@ -22,10 +23,15 @@ export const getAllCourse = (query) => async (dispatch) => {
         dispatch(courseFetchSuccess(res?.data.data))
         return res.data.message
     } catch (error) {
-        dispatch(courseFetchFailure(error.message))
+        if (error?.response?.data?.message) {
 
+            dispatch(courseFetchFailure(error?.response?.data?.message))
+            throw error.response.data.message
+        } else {
+            dispatch(courseFetchFailure(error?.message))
 
-        throw error.message
+            throw error.message
+        }
     }
 }
 export const getSpecificCourse = (id, token) => async (dispatch) => {
@@ -85,12 +91,22 @@ export const createCourse = (form, token) => async (dispatch) => {
             },
             withCredentials: true
         })
+        console.log(res);
+        user?.createdCourses.push(res?._id)
         dispatch(courseCreateSuccess())
         return res.data.message
 
     } catch (error) {
-        dispatch(courseFetchFailure(error.response.data.message))
-        throw error.response.data.message
+
+        if (error?.response?.data?.message) {
+
+            dispatch(courseFetchFailure(error?.response?.data?.message))
+            throw error.response.data.message
+        } else {
+            dispatch(courseFetchFailure(error?.message))
+
+            throw error.message
+        }
     }
 }
 export const updateCourse = (form, token, id) => async (dispatch) => {
@@ -107,10 +123,15 @@ export const updateCourse = (form, token, id) => async (dispatch) => {
         return res.data.message
 
     } catch (error) {
-        dispatch(courseFetchFailure(error.response.data.message))
-        console.log(error);
+        if (error?.response?.data?.message) {
 
-        throw error.response.data.message
+            dispatch(courseFetchFailure(error?.response?.data?.message))
+            throw error.response.data.message
+        } else {
+            dispatch(courseFetchFailure(error?.message))
+
+            throw error.message
+        }
     }
 }
 export const deleteCourse = (token, id) => async (dispatch) => {
@@ -128,10 +149,15 @@ export const deleteCourse = (token, id) => async (dispatch) => {
         return res.data.message
 
     } catch (error) {
-        dispatch(courseFetchFailure(error.response.data.message))
+        if (error?.response?.data?.message) {
 
+            dispatch(courseFetchFailure(error?.response?.data?.message))
+            throw error.response.data.message
+        } else {
+            dispatch(courseFetchFailure(error?.message))
 
-        throw error.response.data.message
+            throw error.message
+        }
     }
 }
 
@@ -151,7 +177,14 @@ export const getEnrolledCourses = (token) => async (dispatch) => {
         return res.data
 
     } catch (error) {
-        dispatch(courseFetchFailure(error?.message))
-        throw error.response.data.message
+        if (error?.response?.data?.message) {
+
+            dispatch(courseFetchFailure(error?.response?.data?.message))
+            throw error.response.data.message
+        } else {
+            dispatch(courseFetchFailure(error?.message))
+
+            throw error.message
+        }
     }
 }

@@ -12,15 +12,8 @@ function Otp() {
     const otp = useRef()
     const token = localStorage.getItem('tempToken')
     const { user } = useSelector((state) => state.auth)
+    const [loading, setLoading] = useState(false)
     const navigate = useNavigate()
-    const [timer, setTimer] = useState(60);
-
-
-    useEffect(() => {
-        if (timer === 0) return;
-        const interval = setInterval(() => setTimer((prev) => prev - 1), 1000);
-        return () => clearInterval(interval);
-    }, [timer]);
 
     useEffect(() => {
         if (user) {
@@ -28,14 +21,12 @@ function Otp() {
         }
     }, [user])
 
-
-
-
     const handleForm = async (e) => {
         e.preventDefault()
         if (otp.current.length !== 6) return
         if (!token) return
         try {
+            setLoading(true)
             const res = await axios.post(
                 'http://localhost:8800/api/auth/verifyEmail',
                 { otp: otp.current },
@@ -48,9 +39,11 @@ function Otp() {
             );
             localStorage.removeItem('tempToken')
 
+            setLoading(false)
             notify('success', res?.data?.message)
             navigate('/auth')
         } catch (error) {
+            setLoading(true)
             console.log(error);
             notify('error', error.response.data.message)
         }
@@ -64,12 +57,9 @@ function Otp() {
                     <p>Enter the 6 digit-code sent to your email</p>
                     <form onSubmit={handleForm}>
                         <div id="otp-form">
-                            <div>
-                                <input type="text" name='input' onChange={(e) => otp.current = e.target.value} className="otp-input" maxLength="6" required />
-                                <p>Otp expires in {timer}s</p>
-                            </div>
+                            <input type="text" name='input' onChange={(e) => otp.current = e.target.value} className="otp-input" maxLength="6" required />
                         </div>
-                        <button id="verify-btn" >{timer > 1 ? 'Verify OTP' : 'Resend'}</button>
+                        <button id="verify-btn" disabled={loading}>Verify OTP</button>
                     </form>
                 </div>
             </section>

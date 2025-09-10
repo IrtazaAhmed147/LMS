@@ -132,17 +132,15 @@ export const deleteLesson = async (req, res) => {
 }
 
 export const updateLesson = async (req, res) => {
-    console.log(req.body);
-    console.log(req.params.id);
-    
+
     try {
         const file = req.file;
 
-        const updateData = { ...req.body }; // copy body fields
+        const updateData = { ...req.body };
 
         if (file) {
             const result = await uploadOnCloudinary(file, "lesson-content");
-            updateData.contentUrl = result.secure_url; // store new url
+            updateData.contentUrl = result.secure_url;
         }
 
         const lessonData = await Lesson.findByIdAndUpdate(

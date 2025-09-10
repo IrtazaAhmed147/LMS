@@ -4,7 +4,7 @@ import { errorHandler, successHandler } from '../utils/responseHandler.js'
 import bcrypt, { compare } from "bcryptjs";
 import { generateEmail, GenerateToken, VerifyEmailToken } from '../utils/commonFunctions.js';
 import { nanoid } from 'nanoid'
-import mongoose from 'mongoose';
+import { verifyToken } from '../middleware/verifyToken.js';
 
 
 export const register = async (req, res) => {
@@ -26,14 +26,6 @@ export const register = async (req, res) => {
         const salt = bcrypt.genSaltSync(10);
         const hash = bcrypt.hashSync(password, salt);
 
-        // const newUser = await User({
-        //     username,
-        //     email,
-        //     password: hash,
-        //     role
-        // })
-
-
         const doc = await User({
             username,
             email,
@@ -44,15 +36,10 @@ export const register = async (req, res) => {
 
         const otp = nanoid().slice(0, 6)
         doc.otp = otp
-        doc.otpExpires = Date.now() + 60000; // OTP expires in 60s
+        doc.otpExpires = Date.now() + 300000; // OTP expires in 60s
         doc.isVerified = false
-
-
-
         let savedUser = await doc.save();
-        const token = GenerateToken({ data: savedUser, expiresIn: '10m' });
-
-
+        const token = GenerateToken({ data: savedUser, expiresIn: '5m' });
 
         if (savedUser) {
             const emailSent = await generateEmail(email, otp)
@@ -89,10 +76,10 @@ export const login = async (req, res, next) => {
         if (!user.isVerified) {
             const otp = nanoid().slice(0, 6);
             user.otp = otp;
-            user.otpExpires = Date.now() + 60000; // 1 min
+            user.otpExpires = Date.now() + 300000; // 1 min
             await user.save();
 
-            const token = GenerateToken({ data: { _id: user._id, email: user.email }, expiresIn: '10m' });
+            const token = GenerateToken({ data: { _id: user._id, email: user.email }, expiresIn: '5m' });
 
             await generateEmail(user.email, otp);
 
@@ -104,7 +91,6 @@ export const login = async (req, res, next) => {
             );
         }
 
-        // ✅ User verified → allow login
         const token = jwt.sign(
             { id: user._id, username: user.username, role: user.role },
             process.env.JWT,
@@ -176,3 +162,15 @@ export const verifyEmail = async (req, res) => {
         return errorHandler(res, 500, "Something went wrong");
     }
 }
+export const isUser = (req, res, next) => {
+    console.log('backend');
+    
+  try {
+
+        return successHandler(res,200,'token is valid')
+    } catch (error) {
+        console.log(error);
+        
+    return errorHandler(res, 500, "Something went wrong");
+  }
+};

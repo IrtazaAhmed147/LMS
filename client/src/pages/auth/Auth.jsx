@@ -86,15 +86,15 @@ function Auth() {
 
                             <label >
                                 <Typography fontWeight={'bold'}>Username</Typography>
-                                <input onChange={(e) => form.current.username = e.target.value} className='authInput' type="text" placeholder='Enter username' />
+                                <input onChange={(e) => form.current.username = e.target.value} className='authInput' required type="text" placeholder='Enter username' />
                             </label>
                             <label >
                                 <Typography fontWeight={'bold'}>User Email</Typography>
-                                <input onChange={(e) => form.current.email = e.target.value} className='authInput' type="email" placeholder='Enter your email' />
+                                <input onChange={(e) => form.current.email = e.target.value} className='authInput' required type="email" placeholder='Enter your email' />
                             </label>
                             <label >
                                 <Typography fontWeight={'bold'}>Password</Typography>
-                                <input onChange={(e) => form.current.password = e.target.value} className='authInput' type="password" placeholder='' />
+                                <input onChange={(e) => form.current.password = e.target.value} className='authInput' required type="password" placeholder='' />
                             </label>
                             <Typography fontWeight={'bold'}>Role</Typography>
                             <Select sx={{ width: '100%' }} defaultValue={'student'} onChange={(e) => form.current.role = e.target.value}>
