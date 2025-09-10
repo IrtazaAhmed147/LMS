@@ -23,8 +23,7 @@ function Course() {
   const { course, isLoading, error, language, categories } = useSelector(
     (state) => state.course
   );
-  console.log(error, '==>> error');
-  
+
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
   };
@@ -54,7 +53,7 @@ function Course() {
         setMobileOpen={setMobileOpen}
         handleDrawerToggle={handleDrawerToggle}
         isMobile={isMobile} />
-      <Box sx={{width:'100%' , padding: { md: 2, sm: 1, xs: 0.5 } }}>
+      <Box sx={{ width: '100%', padding: { md: 2, sm: 1, xs: 0.5 } }}>
         <Box
           display={'flex'}
           gap={1}
@@ -73,13 +72,13 @@ function Course() {
             value={sortBy}
             sx={{
               height: '46px',
-              minWidth: { xs: "70px", sm: "100px", md: "120px" }, // responsive width
-              fontSize: { xs: "12px", sm: "14px", md: "16px" },    // responsive font size
+              minWidth: { xs: "70px", sm: "100px", md: "120px" },
+              fontSize: { xs: "12px", sm: "14px", md: "16px" },
               border: "1px solid #ddd",
               borderRadius: "8px",
               backgroundColor: "#fff",
               "& .MuiSelect-icon": {
-                fontSize: { xs: "16px", sm: "18px" }, // arrow size responsive
+                fontSize: { xs: "16px", sm: "18px" },
               }
             }}
           >

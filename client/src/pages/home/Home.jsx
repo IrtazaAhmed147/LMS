@@ -1,15 +1,10 @@
 import React, { useEffect } from 'react';
-import { Box, Typography, Container, CircularProgress, Button } from '@mui/material';
-import Sidebar from '../../components/sideBar/SideBar';
-import CourseCard from '../../components/card/CourseCard';
-import DashboardStatsCard from '../../components/card/DashboardStatsCard';
-import LessonCard from '../../components/card/LessonCard';
+import { Box, Typography, CircularProgress, Button } from '@mui/material';
 import { useDispatch, useSelector } from 'react-redux';
-import { getDashboardStats } from '../../redux/actions/dashboardActions';
-import { getAllCourse, getEnrolledCourses } from '../../redux/actions/courseActions';
+import { getAllCourse } from '../../redux/actions/courseActions';
 import banner from '../../assets/lms banner.png'
 import FeatureCard from '../../components/card/FeatureCard';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { updateCategories } from '../../redux/slices/courseSlice';
 
 function Home() {
@@ -34,10 +29,6 @@ function Home() {
   ]
 
   useEffect(() => {
-
-    // if (queryCategory) query.category = [queryCategory];
-
-
     dispatch(getAllCourse({ limit: 8 }));
   }, []);
 
@@ -91,7 +82,6 @@ function Home() {
                 <Typography color="error">{error}</Typography>
               ) :
                 course?.map((value) => (
-
                   <FeatureCard  {...value} key={value._id} />
                 ))}
 

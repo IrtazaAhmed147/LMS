@@ -1,16 +1,11 @@
-import React, { useEffect, useRef } from 'react';
-import { Box, Container, Typography, TextField, InputAdornment, MenuItem, Select, FormControl, InputLabel, CircularProgress } from '@mui/material';
-import SearchIcon from '@mui/icons-material/Search';
-import CourseCard from '../../components/card/CourseCard';
+import React, { useEffect } from 'react';
+import { Box, Typography, CircularProgress } from '@mui/material';
 import { useDispatch, useSelector } from 'react-redux';
 import { getEnrolledCourses } from '../../redux/actions/courseActions';
-import { useParams } from 'react-router-dom';
 import FeatureCard from '../../components/card/FeatureCard';
 
 const EnrolledCourses = () => {
     const dispatch = useDispatch()
-
-
     const token = localStorage.getItem('token')
     const { enrolledCourses, isLoading, error } = useSelector((state) => state.course)
     useEffect(() => {
@@ -20,12 +15,11 @@ const EnrolledCourses = () => {
     return (
         <Box
             flex={1}
-            // bgcolor="#f5f5f5"
             minHeight="100vh"
             py={1}
             px={3}
             sx={{
-                width: '100%', // Adjust for sidebar
+                width: '100%',
             }}
         >
             <Box sx={{ width: '100%' }}>
@@ -47,13 +41,12 @@ const EnrolledCourses = () => {
                         }}>
 
                             <CircularProgress color='inherit' />
-                        </Box>:  error ? (
-                                  <Typography color="error">{error}</Typography>
-                                ) 
-                        : enrolledCourses?.map((value) => (
-
-                            <FeatureCard  {...value} key={value._id} />
-                        ))}
+                        </Box> : error ? (
+                            <Typography color="error">{error}</Typography>
+                        )
+                            : enrolledCourses?.map((value) => (
+                                <FeatureCard  {...value} key={value._id} />
+                            ))}
                 </Box>
             </Box>
         </Box>

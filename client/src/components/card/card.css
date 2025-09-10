@@ -1,0 +1,18 @@
+.lesson-card {
+  display: flex;
+  gap: 1rem;
+  height: 100px;
+  background-color: #161722ff;
+  padding: 10px;
+  width: 100%;
+  border-radius: 12px; 
+  box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.35); 
+  overflow: hidden;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  position: relative;
+}
+
+.lesson-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.45);
+}

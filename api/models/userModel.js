@@ -23,6 +23,15 @@ const userSchema = new mongoose.Schema({
         required: true,
         lowercase: true,
     },
+    isVerified:{
+        type:Boolean,
+    },
+    otp: {
+        type:String,
+    },
+    otpExpires: {
+        type:String,
+    },
     enrolledCourses: [
         {
             courseId: { type: mongoose.Schema.Types.ObjectId, ref: "Course" },

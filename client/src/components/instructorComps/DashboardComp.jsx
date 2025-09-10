@@ -6,15 +6,12 @@ import { useSelector } from 'react-redux';
 
 function DashboardComp({ courses }) {
     const { users, isLoading, error } = useSelector((state) => state.user)
-
-
-
     return (
         <>
 
             <Box sx={{ display: 'flex', justifyContent: 'space-between' }} mt={3} mb={5}>
 
-                <Box sx={{ width: '49%', border: '1px solid #e3e3e3', borderRadius: '10px', backgroundColor: "#fff", padding: {md:'20px',xs:'10px'}, }}>
+                <Box sx={{ width: '49%', border: '1px solid #e3e3e3', borderRadius: '10px', backgroundColor: "#fff", padding: { md: '20px', xs: '10px' }, }}>
                     <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
                         <Typography fontWeight={'bold'} fontSize={16}>Total Students</Typography>
                         <Typography><PeopleOutlineOutlinedIcon /></Typography>
@@ -22,7 +19,7 @@ function DashboardComp({ courses }) {
                     <Typography fontWeight={'bold'} fontSize={21}>{users?.length || 0}</Typography>
                 </Box>
 
-                <Box sx={{ width: '49%', border: '1px solid #e3e3e3', borderRadius: '10px', backgroundColor: "#fff", padding: {md:'20px',xs:'10px'}, }}>
+                <Box sx={{ width: '49%', border: '1px solid #e3e3e3', borderRadius: '10px', backgroundColor: "#fff", padding: { md: '20px', xs: '10px' }, }}>
                     <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
                         <Typography fontWeight={'bold'} fontSize={16}>Total Courses</Typography>
                         <Typography><MenuBookOutlinedIcon /></Typography>
@@ -32,7 +29,7 @@ function DashboardComp({ courses }) {
 
             </Box>
 
-            <Box sx={{ padding: {md:'20px',xs:'5px'}, border: '1px solid #e3e3e3', borderRadius: '10px', backgroundColor: "#fff", }} >
+            <Box sx={{ padding: { md: '20px', xs: '5px' }, border: '1px solid #e3e3e3', borderRadius: '10px', backgroundColor: "#fff", }} >
                 <Typography fontWeight={'bold'} fontSize={18}>Students List</Typography>
                 {isLoading ?
                     <Box sx={{

@@ -1,9 +1,7 @@
-import React from "react";
 import { Box, Typography } from "@mui/material";
 
-function DeleteModal({type, setModal, id, handleDelete }) {
-  console.log(id);
-  
+function DeleteModal({ type, setModal, id, handleDelete }) {
+
   return (
     <Box
       sx={{
@@ -13,7 +11,7 @@ function DeleteModal({type, setModal, id, handleDelete }) {
         alignItems: "center",
         justifyContent: "center",
         backgroundColor: "rgba(0,0,0,0.5)",
-        zIndex:'1212'
+        zIndex: '1212'
       }}
     >
       <Box sx={{ background: "#fff", p: 3, borderRadius: 2, width: "400px" }}>
@@ -25,13 +23,13 @@ function DeleteModal({type, setModal, id, handleDelete }) {
         <Box sx={{ display: "flex", justifyContent: "flex-end", gap: 2 }}>
           <button
             className="common-btn"
-            onClick={() => setModal(false)} // ✅ cancel closes modal
+            onClick={() => setModal(false)}
           >
             Cancel
           </button>
           <button
             className="common-btn"
-            onClick={() => handleDelete(id)} // ✅ delete specific course
+            onClick={() => handleDelete(id)}
           >
             Delete
           </button>

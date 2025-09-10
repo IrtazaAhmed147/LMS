@@ -1,21 +1,15 @@
-import React, { useEffect } from 'react';
-import { Card, CardContent, Typography, Box } from '@mui/material';
+import { Box } from '@mui/material';
 import SchoolIcon from '@mui/icons-material/School';
 import PeopleIcon from '@mui/icons-material/People';
 import MenuBookIcon from '@mui/icons-material/MenuBook';
 import PersonIcon from '@mui/icons-material/Person';
 import StatCard from './StatCard';
-import { useDispatch, useSelector } from 'react-redux';
-import { getDashboardStats } from '../../redux/actions/dashboardActions';
+import { useSelector } from 'react-redux';
 
 
 const DashboardStatsCard = () => {
 
-  const {stats} = useSelector((state)=> state.dashboard)
-  const dispatch = useDispatch()
-  // useEffect(()=> {
-  //   dispatch(getDashboardStats())
-  // },[])
+  const { stats } = useSelector((state) => state.dashboard)
 
   return (
     <Box display="flex" flexWrap="wrap" gap={2}>

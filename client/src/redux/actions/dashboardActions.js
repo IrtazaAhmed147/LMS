@@ -5,11 +5,10 @@ export const getDashboardStats = () => async (dispatch) => {
     try {
         dispatch(statFetchStart())
 
-        const res = await api.get('/dashboard/stat',  {
+        const res = await api.get('/dashboard/stat', {
             withCredentials: true
         })
-        console.log(res);
-        
+
         dispatch(statFetchSuccess(res?.data.data))
         return res.data.message
     } catch (error) {

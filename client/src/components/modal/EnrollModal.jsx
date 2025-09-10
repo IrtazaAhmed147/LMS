@@ -1,7 +1,6 @@
-import React from "react";
 import { Box, Typography } from "@mui/material";
 
-function EnrollModal({ setModal, handleEnroll,loading }) {
+function EnrollModal({ setModal, handleEnroll, loading }) {
   return (
     <Box
       sx={{
@@ -11,7 +10,7 @@ function EnrollModal({ setModal, handleEnroll,loading }) {
         alignItems: "center",
         justifyContent: "center",
         backgroundColor: "rgba(0,0,0,0.5)",
-        zIndex:'1212'
+        zIndex: '1212'
       }}
     >
       <Box sx={{ background: "#fff", p: 3, borderRadius: 2, width: "400px" }}>
@@ -22,16 +21,16 @@ function EnrollModal({ setModal, handleEnroll,loading }) {
 
         <Box sx={{ display: "flex", justifyContent: "flex-end", gap: 2 }}>
           <button
-          disabled={loading ? true : false}
+            disabled={loading ? true : false}
             className="common-btn"
-            onClick={() => setModal(false)} 
+            onClick={() => setModal(false)}
           >
-           No
+            No
           </button>
           <button
-          disabled={loading ? true : false}
+            disabled={loading ? true : false}
             className="common-btn"
-            onClick={()=> handleEnroll()} 
+            onClick={() => handleEnroll()}
           >
             Enroll
           </button>

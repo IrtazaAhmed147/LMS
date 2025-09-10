@@ -1,19 +1,14 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Box,
-  TextField,
-  Button,
   Typography,
   MenuItem,
-  InputLabel,
-  FormControl,
   Select,
-  Divider,
   CircularProgress
 } from '@mui/material';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { createCourse, getSpecificCourse, updateCourse } from '../../redux/actions/courseActions';
+import { createCourse, updateCourse } from '../../redux/actions/courseActions';
 import { notify } from '../../utils/HelperFunctions';
 
 const CreateCourse = () => {
@@ -23,12 +18,10 @@ const CreateCourse = () => {
   const { singleCourse, isLoading, error } = useSelector((state) => state.course)
   const token = localStorage.getItem('token')
   const [box, setBox] = useState('landing')
-  const [lectureCount, setLectureCount] = useState(1)
+  const [thumbnailPreview, setThumbnailPreview] = useState(singleCourse?.thumbnail || null);
   const navigate = useNavigate()
   useEffect(() => {
-
     if (singleCourse?.title) {
-
       setMode('edit')
     }
   }, [])
@@ -52,23 +45,12 @@ const CreateCourse = () => {
     category: singleCourse?.category || '',
     language: singleCourse?.language || '',
     subTitle: singleCourse?.subTitle || '',
-
     thumbnail: singleCourse?.thumbnail || null,
   });
-
-  const [lectureData, setLectureData] = useState([
-    { title: 'lecture 1' }
-  ])
-
-
-  const [thumbnailPreview, setThumbnailPreview] = useState(singleCourse?.thumbnail || null);
-
-
 
   const handleThumbnailUpload = (e) => {
     const file = e.target.files[0];
     if (file) {
-      // setCourseData({ ...courseData, thumbnail: file });
       courseData.thumbnail = file
       setThumbnailPreview(URL.createObjectURL(file));
     }
@@ -85,40 +67,29 @@ const CreateCourse = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-
-
     const formData = new FormData();
     if (!courseData.title.trim() || !courseData.description.trim() || !courseData.category.trim() || !courseData.language.trim() || !courseData.thumbnail || !courseData.subTitle.trim()) return notify('error', 'missing fields')
 
-    // // Append all fields from courseData.current
     for (const key in courseData) {
       formData.append(key, courseData[key]);
     }
     if (mode === 'create') {
-
-
       dispatch(createCourse(formData, token)).then((msg) => {
         notify('success', msg)
         navigate('/instructor')
       }).catch((msg) => console.log(msg))
     } else if (mode === 'edit') {
-      console.log(mode);
-      console.log(singleCourse?._id);
-      console.log([...formData]);
-
       dispatch(updateCourse(formData, token, singleCourse._id)).then((msg) => {
         notify('success', msg)
         navigate('/instructor')
       })
 
     }
-
   };
 
-  
+
 
   useEffect(() => {
-    // Cleanup preview URL to avoid memory leaks
     return () => {
       if (thumbnailPreview) {
         URL.revokeObjectURL(thumbnailPreview);
@@ -130,8 +101,7 @@ const CreateCourse = () => {
     <Box
       sx={{
         minHeight: '100vh',
-        // width: 'calc(100vw - 265px)',
-        px: {md:1,xs:0.5},
+        px: { md: 1, xs: 0.5 },
         py: 2,
         bgcolor: '#f9f9f9',
         overflowY: 'auto',

@@ -83,7 +83,6 @@ const TeacherSideBar = ({ drawerWidth, mobileOpen,setMobileOpen, handleDrawerTog
         
         disableAutoFocus
           anchor="left"
-          disableEnforceFocus
           variant="temporary"
           open={mobileOpen}
           onClose={handleDrawerToggle}
@@ -104,7 +103,6 @@ const TeacherSideBar = ({ drawerWidth, mobileOpen,setMobileOpen, handleDrawerTog
       {!isMobile && (
         <Drawer
           anchor="left"
-          disableEnforceFocus
           variant="permanent"
           sx={{
             width: drawerWidth,

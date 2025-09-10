@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom'
 import { notify } from '../../utils/HelperFunctions'
 import { useSelector } from 'react-redux'
 import { useEffect } from 'react'
+import { useState } from 'react'
 
 function Otp() {
 
@@ -12,24 +13,31 @@ function Otp() {
     const token = localStorage.getItem('tempToken')
     const { user } = useSelector((state) => state.auth)
     const navigate = useNavigate()
+    const [timer, setTimer] = useState(60);
+
+
+    useEffect(() => {
+        if (timer === 0) return;
+        const interval = setInterval(() => setTimer((prev) => prev - 1), 1000);
+        return () => clearInterval(interval);
+    }, [timer]);
 
     useEffect(() => {
         if (user) {
             navigate('/')
-        } else if (!token) {
-            navigate('/signup')
         }
     }, [user])
+
 
 
 
     const handleForm = async (e) => {
         e.preventDefault()
         if (otp.current.length !== 6) return
-        if(!token) return
+        if (!token) return
         try {
             const res = await axios.post(
-                'http://localhost:3200/api/auth/verifyEmail',
+                'http://localhost:8800/api/auth/verifyEmail',
                 { otp: otp.current },
                 {
                     withCredentials: true,
@@ -39,8 +47,9 @@ function Otp() {
                 }
             );
             localStorage.removeItem('tempToken')
-            notify('success', res.data.message)
-            navigate('/login')
+
+            notify('success', res?.data?.message)
+            navigate('/auth')
         } catch (error) {
             console.log(error);
             notify('error', error.response.data.message)
@@ -51,12 +60,16 @@ function Otp() {
         <div>
             <section className='otp-container'>
                 <div className="otp-box">
-                    <h1 className="title">Enter OTP</h1>
+                    <h1 className="title">Verify Your OTP</h1>
+                    <p>Enter the 6 digit-code sent to your email</p>
                     <form onSubmit={handleForm}>
                         <div id="otp-form">
-                            <input type="text" name='input' onChange={(e) => otp.current = e.target.value} className="otp-input" maxLength="6" required />
+                            <div>
+                                <input type="text" name='input' onChange={(e) => otp.current = e.target.value} className="otp-input" maxLength="6" required />
+                                <p>Otp expires in {timer}s</p>
+                            </div>
                         </div>
-                        <button id="verify-btn">Verify OTP</button>
+                        <button id="verify-btn" >{timer > 1 ? 'Verify OTP' : 'Resend'}</button>
                     </form>
                 </div>
             </section>

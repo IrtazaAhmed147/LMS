@@ -20,28 +20,41 @@ export const registerUser = (info) => async (dispatch) => {
         return res.data.message
     } catch (error) {
         console.log(error);
-        
-        dispatch(signupFailure(error.response.data.message))
-        throw error.response.data.message
+        if (error?.response?.data?.message) {
+
+            dispatch(signupFailure(error?.response?.data?.message))
+            throw error.response.data.message
+        } else {
+            dispatch(signupFailure(error?.message))
+
+            throw error.message
+        }
     }
 }
-
-export const loginUser = (credentials) => async (dispatch) => {
-
+export const loginUser = (credentials, navigate) => async (dispatch) => {
     try {
-        dispatch(loginStart())
+        dispatch(loginStart());
 
         const res = await api.post('/auth/login', credentials, {
             withCredentials: true
-        })
+        });
 
-        dispatch(loginSuccess(res?.data.data))
-        localStorage.setItem("token", res?.data?.token)
-        return res.data.message
+        dispatch(loginSuccess(res?.data.data));
+        localStorage.setItem("token", res?.data?.data?.token);
+
+        return res.data.message;
     } catch (error) {
         console.log(error);
 
-        dispatch(loginFailure(error.response.data.message))
-        throw error.response.data.message
+        const message = error?.response?.data?.message || error.message;
+
+        // Handle OTP redirection
+        if (error?.response?.data?.data?.redirectTo === "otp") {
+            localStorage.setItem("tempToken", error?.response?.data?.data?.token);
+            navigate('/otp');
+        }
+
+        dispatch(loginFailure(message));
+        throw message;
     }
-}
+};

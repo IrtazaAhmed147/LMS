@@ -6,7 +6,6 @@ import {
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { getSpecificCourse } from '../../redux/actions/courseActions';
-import { getCourselesson } from '../../redux/actions/lessonActions';
 import api from '../../utils/common.js'
 import { notify } from '../../utils/HelperFunctions';
 import LanguageIcon from '@mui/icons-material/Language';
@@ -39,7 +38,6 @@ const SingleCourse = () => {
         },
         withCredentials: true
       })
-      console.log(res);
       setLoading(false)
       notify('success', res.data.message)
       setModal(false)
@@ -47,7 +45,7 @@ const SingleCourse = () => {
     } catch (error) {
       setLoading(false)
       console.log(error);
-      
+
       notify('error', error.response.data.message)
 
     }
@@ -62,7 +60,7 @@ const SingleCourse = () => {
   return (
     <>
 
-      <Box  sx={{padding:{md:'20px',xs:'10px'}}}>
+      <Box sx={{ padding: { md: '20px', xs: '10px' } }}>
         <Box sx={{ bgcolor: '#1a1b2b', borderTopLeftRadius: '10px', borderTopRightRadius: '10px', padding: '20px' }}>
 
           <Typography mb={2} fontWeight={'bold'} fontSize={30} color='#fff'>{singleCourse?.title || 'Title'}</Typography>
@@ -80,7 +78,7 @@ const SingleCourse = () => {
         </Box>
 
         <Box display={'flex'} flexWrap={'wrap'} justifyContent={'space-between'} gap={1} >
-          <Box sx={{width:{md:'67%',sm:'55%'}}} marginTop={'20px'}>
+          <Box sx={{ width: { md: '67%', sm: '55%' } }} marginTop={'20px'}>
 
             <Box sx={{ border: '1px solid #ddd', width: '100%', borderRadius: '8px', marginBottom: '20px', padding: '20px' }}>
               <Typography fontSize={18} fontWeight={'bold'}>What you'll learn</Typography>
@@ -99,32 +97,32 @@ const SingleCourse = () => {
             </Box>
             <Box marginBottom={2} sx={{ border: '1px solid #ddd', width: '100%', borderRadius: '8px', padding: '20px' }}>
               <Typography fontSize={18} fontWeight={'bold'} marginBottom={2}>Course Curriculum</Typography>
-              {singleCourse?.lessons?.map((lesson)=> (
+              {singleCourse?.lessons?.map((lesson) => (
 
-              <Typography key={lesson?._id} fontSize={15} display={'flex'} alignItems={'center'}><PlayCircleOutlinedIcon fontSize="small" />{lesson.title}</Typography>
+                <Typography key={lesson?._id} fontSize={15} display={'flex'} alignItems={'center'}><PlayCircleOutlinedIcon fontSize="small" />{lesson.title}</Typography>
               ))}
 
             </Box>
 
           </Box>
 
-          <Box sx={{  marginTop: '20px', width: {md:'30%',sm:'42%'},    }}>
-          <Box sx={{ border: '1px solid #ddd', borderRadius: '8px',padding: {md:'20px',xs:'5px'},}}>
+          <Box sx={{ marginTop: '20px', width: { md: '30%', sm: '42%' }, }}>
+            <Box sx={{ border: '1px solid #ddd', borderRadius: '8px', padding: { md: '20px', xs: '5px' }, }}>
 
 
-            <Box component={'img'} src={singleCourse?.thumbnail} sx={{ width: '100%', maxHeight: '400px' }} />
-            {isEnrolled && 
-            <Link to={`/lesson/detail/${singleCourse._id}`}>
-             <button style={{ width: '100%', padding: '10px', borderRadius: '10px', backgroundColor: '#1f1f1fdd', color: '#fff' }} >Continue</button>
-            </Link>
-             }
-            {!isEnrolled &&  <button style={{ width: '100%', padding: '10px', borderRadius: '10px', backgroundColor: '#1f1f1fdd', color: '#fff' }} onClick={()=> setModal(true)}>Enroll Now</button>}
-           
-          </Box>
+              <Box component={'img'} src={singleCourse?.thumbnail} sx={{ width: '100%', maxHeight: '400px' }} />
+              {isEnrolled &&
+                <Link to={`/lesson/detail/${singleCourse._id}`}>
+                  <button style={{ width: '100%', padding: '10px', borderRadius: '10px', backgroundColor: '#1f1f1fdd', color: '#fff' }} >Continue</button>
+                </Link>
+              }
+              {!isEnrolled && <button style={{ width: '100%', padding: '10px', borderRadius: '10px', backgroundColor: '#1f1f1fdd', color: '#fff' }} onClick={() => setModal(true)}>Enroll Now</button>}
+
+            </Box>
           </Box>
         </Box>
 
-        {modal && <EnrollModal setModal={setModal} loading={loading} handleEnroll={handleEnrollNow}  />}
+        {modal && <EnrollModal setModal={setModal} loading={loading} handleEnroll={handleEnrollNow} />}
       </Box>
     </>
   );

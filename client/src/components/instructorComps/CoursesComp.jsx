@@ -1,5 +1,5 @@
-import { Box, CircularProgress, Typography } from '@mui/material'
 import React, { useEffect, useState } from 'react'
+import { Box, CircularProgress, Typography } from '@mui/material'
 import BackspaceOutlinedIcon from '@mui/icons-material/BackspaceOutlined';
 import BorderColorOutlinedIcon from '@mui/icons-material/BorderColorOutlined';
 import { Link, useNavigate } from 'react-router-dom';
@@ -11,7 +11,6 @@ import DeleteModal from '../modal/DeleteModal';
 
 function CoursesComp() {
 
-
     const dispatch = useDispatch()
     const { user } = useSelector((state) => state.auth)
     const { teacherCourses, isLoading, error } = useSelector((state) => state.course)
@@ -20,18 +19,17 @@ function CoursesComp() {
     const [modal, setModal] = useState(false)
     const navigate = useNavigate()
     const [selectedCourseId, setSelectedCourseId] = useState(null);
+    
     useEffect(() => {
-        console.log(error);
-        
         if (error === 'Token is not valid') {
             handleLogout(dispatch, navigate)
         }
         if (user?.createdCourses?.length === 0) return
         dispatch(getTeacherCourses(user?._id, token))
-    }, [againCall,error])
+    }, [againCall, error])
 
     const handleDelete = (id) => {
-        console.log(id);
+
         dispatch(deleteCourse(token, id)).then((msg) => {
             setAgainCall(prev => !prev)
             setModal(false);
@@ -91,7 +89,6 @@ function CoursesComp() {
                                                 <BackspaceOutlinedIcon fontSize='small' />
                                             </span>
                                         </td>
-                                        {/* <td><button className='common-btn'><Link style={{ color: '#fff' }} to={`/instructor/create-new-lecture/${course._id}`}>Lectures</Link></button></td> */}
                                     </tr>
                                 ))}
                             </tbody>

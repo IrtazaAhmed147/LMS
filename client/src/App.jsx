@@ -11,8 +11,7 @@ import EnrolledCourses from './pages/enrolledCourses/EnrolledCourses.jsx';
 import LessonForm from './pages/createLesson/LessonForm.jsx';
 import Auth from './pages/auth/Auth.jsx';
 import Instructor from './pages/instructor/Instructor.jsx';
-import Navbar from './components/navbar/Navbar.jsx';
-import ProtectedRoute from './components/protectedRoute/protectedRoute.jsx';
+import ProtectedRoute from './layout/protectedRoute/protectedRoute.jsx';
 import LessonPage from './pages/lessonPage/LessonPage.jsx';
 import './App.css'
 
@@ -41,7 +40,7 @@ function App() {
         </Route>
 
         <Route element={<ProtectedRoute allowedRoles={"student"} />}>
-            <Route path='/lesson/detail/:id' element={<LessonPage />} />
+          <Route path='/lesson/detail/:id' element={<LessonPage />} />
           <Route element={<Layout />}>
 
             <Route path='/' element={<Home />} />
@@ -50,11 +49,6 @@ function App() {
             <Route path='/course/enrolled/:id' element={<EnrolledCourses />} />
           </Route>
         </Route>
-
-
-
-
-
 
         <Route path="*" element={<NotFound />} />
       </Routes>

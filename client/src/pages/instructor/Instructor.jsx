@@ -25,11 +25,8 @@ function Instructor() {
     useEffect(() => {
 
         if (user?.createdCourses?.length === 0) return
-
         if (user?.role === 'teacher') {
-
             dispatch(getAllUsers({ courses: user?.createdCourses }))
-
         }
 
     }, [])
@@ -37,7 +34,7 @@ function Instructor() {
     return (
         <>
 
-            <Box sx={{ display: 'flex' }}> 
+            <Box sx={{ display: 'flex' }}>
 
                 <TeacherSideBar drawerWidth={drawerWidth}
                     mobileOpen={mobileOpen}
@@ -48,16 +45,15 @@ function Instructor() {
 
                 <Box sx={{ width: isMobile ? '100%' : `calc(100% - ${drawerWidth}px)`, backgroundColor: '#f3f3f3', minHeight: '100vh', padding: { md: '30px', xs: '5px' } }}>
 
-                    <Box sx={{ display: 'flex', justifyContent: 'space-between',alignItems:'center' }}>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
 
                         <Typography fontWeight={'bold'} variant='h4'>
                             Dashboard
                         </Typography>
-                        <Box sx={{display:{xs:'block',md:'none', cursor:'pointer'}}}  onClick={handleDrawerToggle}>
+                        <Box sx={{ display: { xs: 'block', md: 'none', cursor: 'pointer' } }} onClick={handleDrawerToggle}>
                             <MenuIcon />
                         </Box>
                     </Box>
-
 
                     {isDashboard && <DashboardComp courses={teacherCourses?.length} />}
                     {isCourse && <CoursesComp />}

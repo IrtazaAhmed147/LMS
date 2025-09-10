@@ -16,7 +16,6 @@ const LessonForm = () => {
   const dispatch = useDispatch();
   const token = localStorage.getItem('token');
   const { lessons, isLoading, error } = useSelector((state) => state.lesson);
-
   const [lectureCount, setLectureCount] = useState(1);
   const [box, setBox] = useState('create lecture');
   const [mode, setMode] = useState('create');
@@ -83,7 +82,6 @@ const LessonForm = () => {
         contentUrl: file,
       });
       setLessonImage(URL.createObjectURL(file));
-      console.log(file);
 
     }
   };

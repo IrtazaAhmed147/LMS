@@ -2,7 +2,6 @@ import { userFetchFailure, userFetchStart, userFetchSuccess } from "../slices/us
 import api from '../../utils/common.js'
 
 export const getAllUsers = (query) => async (dispatch) => {
-    console.log(query);
 
     try {
         dispatch(userFetchStart())
@@ -16,7 +15,6 @@ export const getAllUsers = (query) => async (dispatch) => {
             ,
             withCredentials: true
         })
-        console.log(res);
 
         dispatch(userFetchSuccess(res?.data.data))
         return res.data.message

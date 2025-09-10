@@ -1,13 +1,9 @@
 import { Link, useNavigate } from 'react-router-dom'
-import AlternateEmailIcon from '@mui/icons-material/AlternateEmail';
-import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
-import VisibilityIcon from '@mui/icons-material/Visibility';
-import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import './auth.css'
 import { useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { loginUser, registerUser } from '../../redux/actions/authActions';
-import { Box, Button, CircularProgress, MenuItem, Select, Typography } from '@mui/material';
+import { Box, CircularProgress, MenuItem, Select, Typography } from '@mui/material';
 import { notify } from '../../utils/HelperFunctions';
 import { useState } from 'react';
 function Auth() {
@@ -18,39 +14,41 @@ function Auth() {
     const [showPass, setShowPass] = useState(false)
     const { isLoading, error, user } = useSelector((state) => state.auth)
     const form = useRef({
-        role:'student',
-        username:'',
-        email:'',
-        password:''
+        role: 'student',
+        username: '',
+        email: '',
+        password: ''
     })
-    console.log(isLogin);
-
 
     useEffect(() => {
         if (user?.role === 'student') {
-            navigate('/') 
-        } else if(user?.role === 'teacher') {
-            navigate('/instructor') 
+            navigate('/')
+        } else if (user?.role === 'teacher') {
+            navigate('/instructor')
 
         }
     }, [user])
 
     const handleForm = async (e) => {
         e.preventDefault()
-        console.log(form);
-
 
         if (isLogin) {
             if (!form.current.username.trim() || !form.current.password.trim()) return;
-            dispatch(loginUser(form.current))
-                .then((msg) => notify('success', msg))
-                .catch((err) => notify('error', err))
+            dispatch(loginUser(form.current, navigate))
+                .then((msg) => {
+                    notify('success', msg)
+                })
+                .catch((err) => {
+                    notify('error', err)
+
+                })
 
         } else {
-            if (!form.current.username.trim() || !form.current.email.trim() || !form.current.password.trim() || !form.current.role) return notify('error','missing fields');
+            if (!form.current.username.trim() || !form.current.email.trim() || !form.current.password.trim() || !form.current.role) return notify('error', 'missing fields');
             dispatch(registerUser(form.current))
                 .then((msg) => {
                     notify('success', msg)
+                    navigate('/otp')
                     setIsLogin(true)
                 })
                 .catch((err) => notify('error', err))
@@ -88,23 +86,23 @@ function Auth() {
 
                             <label >
                                 <Typography fontWeight={'bold'}>Username</Typography>
-                                <input  onChange={(e) => form.current.username = e.target.value} className='authInput' type="text" placeholder='Enter username' />
+                                <input onChange={(e) => form.current.username = e.target.value} className='authInput' type="text" placeholder='Enter username' />
                             </label>
                             <label >
                                 <Typography fontWeight={'bold'}>User Email</Typography>
-                                <input  onChange={(e) => form.current.email = e.target.value} className='authInput' type="email" placeholder='Enter your email' />
+                                <input onChange={(e) => form.current.email = e.target.value} className='authInput' type="email" placeholder='Enter your email' />
                             </label>
                             <label >
                                 <Typography fontWeight={'bold'}>Password</Typography>
-                                <input  onChange={(e) => form.current.password = e.target.value} className='authInput' type="password" placeholder='' />
+                                <input onChange={(e) => form.current.password = e.target.value} className='authInput' type="password" placeholder='' />
                             </label>
-                                <Typography fontWeight={'bold'}>Role</Typography>
-                            <Select sx={{width:'100%'}} defaultValue={'student'} onChange={(e)=> form.current.role = e.target.value}>
+                            <Typography fontWeight={'bold'}>Role</Typography>
+                            <Select sx={{ width: '100%' }} defaultValue={'student'} onChange={(e) => form.current.role = e.target.value}>
                                 <MenuItem value='student'>Student</MenuItem>
                                 <MenuItem value='teacher'>Teacher</MenuItem>
                             </Select>
 
-                            <button  className='authBtn'>{isLoading && <CircularProgress  color="inherit" size="20px" />} Sign Up</button>
+                            <button className='authBtn'>{isLoading && <CircularProgress color="inherit" size="20px" />} Sign Up</button>
                         </form>
 
                     </Box>}
@@ -125,7 +123,7 @@ function Auth() {
                                 <input className='authInput' onChange={(e) => form.current.password = e.target.value} type="password" required placeholder='' />
                             </label>
 
-                            <button   className='authBtn'>{isLoading && <CircularProgress  color="inherit" size="20px" />} Sign In</button>
+                            <button className='authBtn'>{isLoading && <CircularProgress color="inherit" size="20px" />} Sign In</button>
 
                         </form>
                     </Box>}

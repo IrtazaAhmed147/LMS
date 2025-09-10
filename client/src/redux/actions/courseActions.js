@@ -3,7 +3,6 @@ import api from '../../utils/common.js'
 
 
 export const getAllCourse = (query) => async (dispatch) => {
-    console.log(query);
 
     try {
         dispatch(courseFetchStart())
@@ -14,24 +13,22 @@ export const getAllCourse = (query) => async (dispatch) => {
                 language: JSON.stringify(query?.language),
                 categories: JSON.stringify(query?.category),
                 sortBy: query?.sortBy,
-                limit:query?.limit
+                limit: query?.limit
             }
             ,
             withCredentials: true
         })
-        console.log(res);
 
         dispatch(courseFetchSuccess(res?.data.data))
         return res.data.message
     } catch (error) {
         dispatch(courseFetchFailure(error.message))
-        
+
 
         throw error.message
     }
 }
 export const getSpecificCourse = (id, token) => async (dispatch) => {
-    console.log(id);
 
     try {
         dispatch(courseFetchStart())
@@ -44,7 +41,6 @@ export const getSpecificCourse = (id, token) => async (dispatch) => {
 
                 withCredentials: true
             })
-        console.log(res);
 
         dispatch(singleCourseSuccess(res?.data.data))
         return res.data.message
@@ -56,7 +52,6 @@ export const getSpecificCourse = (id, token) => async (dispatch) => {
     }
 }
 export const getTeacherCourses = (id, token) => async (dispatch) => {
-    console.log(id);
 
     try {
         dispatch(courseFetchStart())
@@ -69,7 +64,6 @@ export const getTeacherCourses = (id, token) => async (dispatch) => {
 
                 withCredentials: true
             })
-        console.log(res);
 
         dispatch(teacherCourseSuccess(res?.data.data))
         return res.data.message
@@ -100,8 +94,7 @@ export const createCourse = (form, token) => async (dispatch) => {
     }
 }
 export const updateCourse = (form, token, id) => async (dispatch) => {
-    console.log([...form]);
-    try { 
+    try {
         dispatch(courseFetchStart())
         const res = await api.put(`/course/update/${id}`, form, {
             headers: {
@@ -123,21 +116,20 @@ export const updateCourse = (form, token, id) => async (dispatch) => {
 export const deleteCourse = (token, id) => async (dispatch) => {
     try {
         dispatch(courseFetchStart())
-        const res = await api.delete(`/course/delete/${id}`,  {
+        const res = await api.delete(`/course/delete/${id}`, {
             headers: {
                 "Authorization": `Bearer ${token}`,
                 'Content-Type': 'multipart/form-data'
             },
             withCredentials: true
         })
-        console.log(res);
-        
+
         dispatch(courseCreateSuccess())
         return res.data.message
 
     } catch (error) {
         dispatch(courseFetchFailure(error.response.data.message))
-        
+
 
         throw error.response.data.message
     }
@@ -145,8 +137,7 @@ export const deleteCourse = (token, id) => async (dispatch) => {
 
 export const getEnrolledCourses = (token) => async (dispatch) => {
     try {
-        console.log(token);
-        
+
 
         dispatch(courseFetchStart())
         const res = await api.get(`/course/enrolled`, {
@@ -155,7 +146,6 @@ export const getEnrolledCourses = (token) => async (dispatch) => {
             },
             withCredentials: true
         })
-        console.log(res.data.data);
 
         dispatch(enrolledCourseSuccess(res.data.data))
         return res.data
