@@ -4,7 +4,6 @@ import { errorHandler, successHandler } from '../utils/responseHandler.js'
 import bcrypt, { compare } from "bcryptjs";
 import { generateEmail, GenerateToken, VerifyEmailToken } from '../utils/commonFunctions.js';
 import { nanoid } from 'nanoid'
-import { verifyToken } from '../middleware/verifyToken.js';
 
 
 export const register = async (req, res) => {

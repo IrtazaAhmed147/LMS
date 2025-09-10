@@ -1,4 +1,4 @@
-import Course from "../models/CourseModel.js";
+import Course from "../models/courseModel.js";
 import lessonModel from "../models/lessonModel.js";
 import User from "../models/userModel.js";
 import { errorHandler, successHandler } from "../utils/responseHandler.js";
