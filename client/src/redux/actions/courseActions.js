@@ -91,8 +91,6 @@ export const createCourse = (form, token) => async (dispatch) => {
             },
             withCredentials: true
         })
-        console.log(res);
-        user?.createdCourses.push(res?._id)
         dispatch(courseCreateSuccess())
         return res.data.message
 

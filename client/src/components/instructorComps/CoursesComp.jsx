@@ -23,7 +23,6 @@ function CoursesComp() {
     useEffect(() => {
         
         
-        if (user?.createdCourses?.length === 0) return
         dispatch(getTeacherCourses(user?._id, token))
     }, [againCall, error])
 
