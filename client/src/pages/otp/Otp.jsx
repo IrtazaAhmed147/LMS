@@ -43,9 +43,15 @@ function Otp() {
             notify('success', res?.data?.message)
             navigate('/auth')
         } catch (error) {
-            setLoading(true)
+            setLoading(false)
             console.log(error);
-            notify('error', error.response.data.message)
+            if( error?.response?.data?.message) {
+
+                notify('error', error?.response?.data?.message)
+            } else {
+                notify('error', error?.message)
+
+            }
         }
     }
 
